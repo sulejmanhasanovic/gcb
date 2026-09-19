@@ -1,0 +1,121 @@
+﻿<%@ Page Language="C#" MasterPageFile="~/masterpage.Master" AutoEventWireup="true"
+    CodeBehind="CreateBox.aspx.cs" Inherits="JIIS.Web.Phase3.Tracking.CreateBox" Title="<%$Resources:LanguageText, tr_boxCreate%>"
+    Theme="Default" %>
+
+<%@ Import Namespace="Resources" %>
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
+<asp:Content ID="Content2" ContentPlaceHolderID="cphContent" runat="server">
+    <div id="PageTitle">
+        <%=LanguageText.tr_boxCreate%><hr style="border-width: 0px; background-color: #718ca5;"
+            noshade="noshade" />
+    </div>
+    <div id="MainBody">
+        <div style="height: 3px;">
+        </div>
+        <asp:UpdatePanel ID="UpdatePanel1" runat="server" UpdateMode="Conditional">
+            <ContentTemplate>
+                <div id="Div2">
+                    <div class="box">
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                            <tr>
+                                <td style="text-align: left">
+                                    <asp:Button ID="Button5" runat="server" CssClass="button100" Text="<%$Resources:LanguageText, bback%>"
+                                        CausesValidation="False" OnClick="btnCancel_Click" />
+                                </td>
+                                <td style="text-align: right">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <br />
+                <table id="Table1" width="100%">
+                    <tr>
+                        <td class="left_table_cell">
+                            <asp:Label ID="Label8" runat="server" Text="<%$Resources:LanguageText, tr_chooseTypeBag%>"></asp:Label>
+                        </td>
+                        <td class="right_table_cell">
+                            <asp:DropDownList ID="ddlChooseTypeBag" runat="server" Width="50%" DataSourceID="dsPSTypes"
+                                DataTextField="PSTypeNameDescription" DataValueField="PSTypeName" AutoPostBack="True"
+                                OnDataBound="ddl_DataBound" OnSelectedIndexChanged="ddlChooseTypeBag_SelectedIndexChanged">
+                            </asp:DropDownList>
+                             <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ErrorMessage="*"
+                                    ControlToValidate="ddlChooseTypeBag"></asp:RequiredFieldValidator>
+                        </td>
+                    </tr>
+                </table>
+                <br />
+                <table id="tblByMail" width="100%" runat="server">
+                    <tr>
+                        <td class="left_table_cell">
+                            <asp:Label ID="Label1" runat="server" Text="<%$Resources:LanguageText, tr_chooseComb%>"></asp:Label>
+                        </td>
+                        <td class="right_table_cell">
+                            <asp:DropDownList ID="ddlCombination" runat="server" Width="20%" DataSourceID="ds_Combinations"
+                                DataTextField="Combination" DataValueField="Combination" OnDataBound="ddlCombination_DataBound"
+                                AutoPostBack="True">
+                            </asp:DropDownList>
+                            <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ErrorMessage="*"
+                                    ControlToValidate="ddlCombination"></asp:RequiredFieldValidator>
+                        </td>
+                    </tr>
+                </table>
+                <br />
+                <table style="width: 100%">
+                    <tr>
+                        <td class="left_table_cell" style="width: 250px;">
+                            &nbsp;
+                        </td>
+                        <td class="right_table_cell">
+                            <asp:Button ID="btnSave" runat="server" Text="<%$Resources:LanguageText, tr_createBox%>"
+                                CssClass="button100" OnClick="btnSave_Click" />
+                            &nbsp;&nbsp;&nbsp;
+                            <asp:Button ID="btnCancel" runat="server" Text="<%$Resources:LanguageText, BCancel %>"
+                                CssClass="button100" OnClick="btnCancel_Click" />
+                        </td>
+                    </tr>
+                </table>
+                <br />
+                <div style="padding: 5px 10px 0px 10px; font-weight: bold; font-size: 120%; background-color: #718ca5;
+                    height: 25px; vertical-align: middle; text-align: center;">
+                    <%=LanguageText.tr_createdBoxes%>
+                </div>
+                <br />
+                <asp:GridView ID="GridView1" runat="server" SkinID="KVoteGridView1" Width="100%"
+                    AutoGenerateColumns="False" DataKeyNames="Id" DataSourceID="dsBags" PageSize="100"
+                    OnRowDataBound="GridView1_DataBound">
+                    <Columns>
+                        <asp:BoundField DataField="BoxName" HeaderText="<%$Resources:LanguageText, tr_boxName%>"
+                            SortExpression="BoxName" />
+                        <asp:BoundField DataField="BoxNo" HeaderText="<%$Resources:LanguageText, tr_boxNumber%>"
+                            SortExpression="BoxNo" />
+                        <asp:BoundField DataField="BoxCombination" HeaderText="<%$Resources:LanguageText, tr_boxCombination%>"
+                            SortExpression="BoxCombination" />
+                        <asp:BoundField DataField="BoxType" HeaderText="<%$Resources:LanguageText, tr_boxType%>"
+                            SortExpression="BoxType" />
+                        <asp:BoundField DataField="TotalNoOfEnvelopes" HeaderText="<%$Resources:LanguageText, tr_totalNoEnvelopes%>"
+                            SortExpression="TotalNoOfEnvelopes" />
+                    </Columns>
+                    <EmptyDataTemplate>
+                        <table style="width: 100%">
+                            <tr>
+                                <td align="center">
+                                    <asp:Label ID="lblNoData" runat="server" Text="<%$Resources:LanguageText, noData%>"
+                                        CssClass="text12_normal"></asp:Label>
+                                </td>
+                            </tr>
+                        </table>
+                    </EmptyDataTemplate>
+                </asp:GridView>
+                <asp:SqlDataSource ID="dsBags" runat="server" ConnectionString="<%$ ConnectionStrings:BVOTEConnectionString %>"
+                    SelectCommand="p3_getFormedBoxes" SelectCommandType="StoredProcedure"></asp:SqlDataSource>
+            </ContentTemplate>
+        </asp:UpdatePanel>
+    </div>
+    <div class="line">
+    </div>
+    <asp:SqlDataSource ID="dsPSTypes" runat="server" ConnectionString="<%$ ConnectionStrings:BVOTEConnectionString %>"
+        SelectCommand="p3_getPSTypes2" SelectCommandType="StoredProcedure"></asp:SqlDataSource>
+    <asp:SqlDataSource ID="ds_Combinations" runat="server" ConnectionString="<%$ ConnectionStrings:BVOTEConnectionString %>"
+        SelectCommand="p3_getCombinations" SelectCommandType="StoredProcedure"></asp:SqlDataSource>
+</asp:Content>

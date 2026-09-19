@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="dsCombination" targetNamespace="http://tempuri.org/dsCombination.xsd" xmlns:mstns="http://tempuri.org/dsCombination.xsd" xmlns="http://tempuri.org/dsCombination.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="1" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Web.config" AppSettingsPropertyName="BVOTEConnectionString" IsAppSettingsProperty="true" Modifier="Assembly" Name="BVOTEConnectionString (Web.config)" ParameterPrefix="@" PropertyReference="AppConfig.System.Configuration.ConfigurationManager.0.ConnectionStrings.BVOTEConnectionString.ConnectionString" Provider="System.Data.SqlClient" />
+          <Connection ConnectionStringObject="Data Source=DEVELOPMENT-2;Initial Catalog=BVote;Persist Security Info=True;User ID=sa;Password=P@ssw0rd" IsAppSettingsProperty="false" Modifier="Assembly" Name="development-2.BVote.dbo" ParameterPrefix="@" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="dsCombination" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="dsCombination" msprop:Generator_DataSetName="dsCombination" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="p3_trackingReportCombination" msprop:Generator_UserTableName="p3_trackingReportCombination" msprop:Generator_RowDeletedName="p3_trackingReportCombinationRowDeleted" msprop:Generator_TableClassName="p3_trackingReportCombinationDataTable" msprop:Generator_RowChangedName="p3_trackingReportCombinationRowChanged" msprop:Generator_RowClassName="p3_trackingReportCombinationRow" msprop:Generator_RowChangingName="p3_trackingReportCombinationRowChanging" msprop:Generator_RowEvArgName="p3_trackingReportCombinationRowChangeEvent" msprop:Generator_RowEvHandlerName="p3_trackingReportCombinationRowChangeEventHandler" msprop:Generator_TablePropName="p3_trackingReportCombination" msprop:Generator_TableVarName="tablep3_trackingReportCombination" msprop:Generator_RowDeletingName="p3_trackingReportCombinationRowDeleting">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Mode" msdata:ReadOnly="true" msprop:Generator_UserColumnName="Mode" msprop:Generator_ColumnPropNameInRow="Mode" msprop:Generator_ColumnVarNameInTable="columnMode" msprop:Generator_ColumnPropNameInTable="ModeColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="4" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="PSBag" msdata:ReadOnly="true" msprop:Generator_UserColumnName="PSBag" msprop:Generator_ColumnPropNameInRow="PSBag" msprop:Generator_ColumnVarNameInTable="columnPSBag" msprop:Generator_ColumnPropNameInTable="PSBagColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="3" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="VoteForlevel" msdata:ReadOnly="true" msprop:Generator_UserColumnName="VoteForlevel" msprop:Generator_ColumnPropNameInRow="VoteForlevel" msprop:Generator_ColumnVarNameInTable="columnVoteForlevel" msprop:Generator_ColumnPropNameInTable="VoteForlevelColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="1" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Total" msdata:ReadOnly="true" msprop:Generator_UserColumnName="Total" msprop:Generator_ColumnPropNameInRow="Total" msprop:Generator_ColumnVarNameInTable="columnTotal" msprop:Generator_ColumnPropNameInTable="TotalColumn" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

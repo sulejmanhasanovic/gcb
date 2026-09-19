@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="dsLevel" targetNamespace="http://tempuri.org/dsLevel.xsd" xmlns:mstns="http://tempuri.org/dsLevel.xsd" xmlns="http://tempuri.org/dsLevel.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Web.config" AppSettingsPropertyName="BVOTEConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="BVOTEConnectionString (Web.config)" ParameterPrefix="@" PropertyReference="AppConfig.System.Configuration.ConfigurationManager.0.ConnectionStrings.BVOTEConnectionString.ConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="dsLevel" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_DataSetName="dsLevel" msprop:Generator_UserDSName="dsLevel" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="p3_trackingReportByLevel" msprop:Generator_UserTableName="p3_trackingReportByLevel" msprop:Generator_RowDeletedName="p3_trackingReportByLevelRowDeleted" msprop:Generator_TableClassName="p3_trackingReportByLevelDataTable" msprop:Generator_RowChangedName="p3_trackingReportByLevelRowChanged" msprop:Generator_RowClassName="p3_trackingReportByLevelRow" msprop:Generator_RowChangingName="p3_trackingReportByLevelRowChanging" msprop:Generator_RowEvArgName="p3_trackingReportByLevelRowChangeEvent" msprop:Generator_RowEvHandlerName="p3_trackingReportByLevelRowChangeEventHandler" msprop:Generator_TablePropName="p3_trackingReportByLevel" msprop:Generator_TableVarName="tablep3_trackingReportByLevel" msprop:Generator_RowDeletingName="p3_trackingReportByLevelRowDeleting">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="LevelCode" msdata:ReadOnly="true" msprop:Generator_UserColumnName="LevelCode" msprop:Generator_ColumnPropNameInRow="LevelCode" msprop:Generator_ColumnVarNameInTable="columnLevelCode" msprop:Generator_ColumnPropNameInTable="LevelCodeColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="4" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TotalP" msdata:ReadOnly="true" msprop:Generator_UserColumnName="TotalP" msprop:Generator_ColumnPropNameInRow="TotalP" msprop:Generator_ColumnVarNameInTable="columnTotalP" msprop:Generator_ColumnPropNameInTable="TotalPColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="ValidP" msdata:ReadOnly="true" msprop:Generator_UserColumnName="ValidP" msprop:Generator_ColumnPropNameInRow="ValidP" msprop:Generator_ColumnVarNameInTable="columnValidP" msprop:Generator_ColumnPropNameInTable="ValidPColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="InvalidP" msdata:ReadOnly="true" msprop:Generator_UserColumnName="InvalidP" msprop:Generator_ColumnPropNameInRow="InvalidP" msprop:Generator_ColumnVarNameInTable="columnInvalidP" msprop:Generator_ColumnPropNameInTable="InvalidPColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="TotalN" msdata:ReadOnly="true" msprop:Generator_UserColumnName="TotalN" msprop:Generator_ColumnPropNameInRow="TotalN" msprop:Generator_ColumnVarNameInTable="columnTotalN" msprop:Generator_ColumnPropNameInTable="TotalNColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="ValidN" msdata:ReadOnly="true" msprop:Generator_UserColumnName="ValidN" msprop:Generator_ColumnPropNameInRow="ValidN" msprop:Generator_ColumnVarNameInTable="columnValidN" msprop:Generator_ColumnPropNameInTable="ValidNColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="InvalidN" msdata:ReadOnly="true" msprop:Generator_UserColumnName="InvalidN" msprop:Generator_ColumnPropNameInRow="InvalidN" msprop:Generator_ColumnVarNameInTable="columnInvalidN" msprop:Generator_ColumnPropNameInTable="InvalidNColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="TotalO" msdata:ReadOnly="true" msprop:Generator_UserColumnName="TotalO" msprop:Generator_ColumnPropNameInRow="TotalO" msprop:Generator_ColumnVarNameInTable="columnTotalO" msprop:Generator_ColumnPropNameInTable="TotalOColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="ValidO" msdata:ReadOnly="true" msprop:Generator_UserColumnName="ValidO" msprop:Generator_ColumnPropNameInRow="ValidO" msprop:Generator_ColumnVarNameInTable="columnValidO" msprop:Generator_ColumnPropNameInTable="ValidOColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="InvalidO" msdata:ReadOnly="true" msprop:Generator_UserColumnName="InvalidO" msprop:Generator_ColumnPropNameInRow="InvalidO" msprop:Generator_ColumnVarNameInTable="columnInvalidO" msprop:Generator_ColumnPropNameInTable="InvalidOColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="TotalD" msdata:ReadOnly="true" msprop:Generator_UserColumnName="TotalD" msprop:Generator_ColumnPropNameInRow="TotalD" msprop:Generator_ColumnVarNameInTable="columnTotalD" msprop:Generator_ColumnPropNameInTable="TotalDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="ValidD" msdata:ReadOnly="true" msprop:Generator_UserColumnName="ValidD" msprop:Generator_ColumnPropNameInRow="ValidD" msprop:Generator_ColumnVarNameInTable="columnValidD" msprop:Generator_ColumnPropNameInTable="ValidDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="InvalidD" msdata:ReadOnly="true" msprop:Generator_UserColumnName="InvalidD" msprop:Generator_ColumnPropNameInRow="InvalidD" msprop:Generator_ColumnVarNameInTable="columnInvalidD" msprop:Generator_ColumnPropNameInTable="InvalidDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="TotalM" msdata:ReadOnly="true" msprop:Generator_UserColumnName="TotalM" msprop:Generator_ColumnPropNameInRow="TotalM" msprop:Generator_ColumnVarNameInTable="columnTotalM" msprop:Generator_ColumnPropNameInTable="TotalMColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="ValidM" msdata:ReadOnly="true" msprop:Generator_UserColumnName="ValidM" msprop:Generator_ColumnPropNameInRow="ValidM" msprop:Generator_ColumnVarNameInTable="columnValidM" msprop:Generator_ColumnPropNameInTable="ValidMColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="InvalidM" msdata:ReadOnly="true" msprop:Generator_UserColumnName="InvalidM" msprop:Generator_ColumnPropNameInRow="InvalidM" msprop:Generator_ColumnVarNameInTable="columnInvalidM" msprop:Generator_ColumnPropNameInTable="InvalidMColumn" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

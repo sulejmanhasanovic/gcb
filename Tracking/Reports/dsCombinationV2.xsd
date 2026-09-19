@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="dsCombinationV2" targetNamespace="http://tempuri.org/dsCombinationV2.xsd" xmlns:mstns="http://tempuri.org/dsCombinationV2.xsd" xmlns="http://tempuri.org/dsCombinationV2.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Web.config" AppSettingsPropertyName="BVote2712ConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="BVote2712ConnectionString (Web.config)" ParameterPrefix="@" PropertyReference="AppConfig.System.Configuration.ConfigurationManager.0.ConnectionStrings.BVote2712ConnectionString.ConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="dsCombinationV2" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_DataSetName="dsCombinationV2" msprop:Generator_UserDSName="dsCombinationV2" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="p3_trackingReportCombinationV2" msprop:Generator_UserTableName="p3_trackingReportCombinationV2" msprop:Generator_RowDeletedName="p3_trackingReportCombinationV2RowDeleted" msprop:Generator_TableClassName="p3_trackingReportCombinationV2DataTable" msprop:Generator_RowChangedName="p3_trackingReportCombinationV2RowChanged" msprop:Generator_RowClassName="p3_trackingReportCombinationV2Row" msprop:Generator_RowChangingName="p3_trackingReportCombinationV2RowChanging" msprop:Generator_RowEvArgName="p3_trackingReportCombinationV2RowChangeEvent" msprop:Generator_RowEvHandlerName="p3_trackingReportCombinationV2RowChangeEventHandler" msprop:Generator_TablePropName="p3_trackingReportCombinationV2" msprop:Generator_TableVarName="tablep3_trackingReportCombinationV2" msprop:Generator_RowDeletingName="p3_trackingReportCombinationV2RowDeleting">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="combination" msprop:Generator_UserColumnName="combination" msprop:Generator_ColumnPropNameInRow="combination" msprop:Generator_ColumnVarNameInTable="columncombination" msprop:Generator_ColumnPropNameInTable="combinationColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="PReg" msprop:Generator_UserColumnName="PReg" msprop:Generator_ColumnPropNameInRow="PReg" msprop:Generator_ColumnVarNameInTable="columnPReg" msprop:Generator_ColumnPropNameInTable="PRegColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="PConf" msprop:Generator_UserColumnName="PConf" msprop:Generator_ColumnPropNameInRow="PConf" msprop:Generator_ColumnVarNameInTable="columnPConf" msprop:Generator_ColumnPropNameInTable="PConfColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="PDen" msprop:Generator_UserColumnName="PDen" msprop:Generator_ColumnPropNameInRow="PDen" msprop:Generator_ColumnVarNameInTable="columnPDen" msprop:Generator_ColumnPropNameInTable="PDenColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="DReg" msprop:Generator_UserColumnName="DReg" msprop:Generator_ColumnPropNameInRow="DReg" msprop:Generator_ColumnVarNameInTable="columnDReg" msprop:Generator_ColumnPropNameInTable="DRegColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="DConf" msprop:Generator_UserColumnName="DConf" msprop:Generator_ColumnPropNameInRow="DConf" msprop:Generator_ColumnVarNameInTable="columnDConf" msprop:Generator_ColumnPropNameInTable="DConfColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="DDen" msprop:Generator_UserColumnName="DDen" msprop:Generator_ColumnPropNameInRow="DDen" msprop:Generator_ColumnVarNameInTable="columnDDen" msprop:Generator_ColumnPropNameInTable="DDenColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="OReg" msprop:Generator_UserColumnName="OReg" msprop:Generator_ColumnPropNameInRow="OReg" msprop:Generator_ColumnVarNameInTable="columnOReg" msprop:Generator_ColumnPropNameInTable="ORegColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="OConf" msprop:Generator_UserColumnName="OConf" msprop:Generator_ColumnPropNameInRow="OConf" msprop:Generator_ColumnVarNameInTable="columnOConf" msprop:Generator_ColumnPropNameInTable="OConfColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="ODen" msprop:Generator_UserColumnName="ODen" msprop:Generator_ColumnPropNameInRow="ODen" msprop:Generator_ColumnVarNameInTable="columnODen" msprop:Generator_ColumnPropNameInTable="ODenColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="NConf" msprop:Generator_UserColumnName="NConf" msprop:Generator_ColumnPropNameInRow="NConf" msprop:Generator_ColumnVarNameInTable="columnNConf" msprop:Generator_ColumnPropNameInTable="NConfColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="NDen" msprop:Generator_UserColumnName="NDen" msprop:Generator_ColumnPropNameInRow="NDen" msprop:Generator_ColumnVarNameInTable="columnNDen" msprop:Generator_ColumnPropNameInTable="NDenColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="MConf" msprop:Generator_UserColumnName="MConf" msprop:Generator_ColumnPropNameInRow="MConf" msprop:Generator_ColumnVarNameInTable="columnMConf" msprop:Generator_ColumnPropNameInTable="MConfColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="MDen" msprop:Generator_UserColumnName="MDen" msprop:Generator_ColumnPropNameInRow="MDen" msprop:Generator_ColumnVarNameInTable="columnMDen" msprop:Generator_ColumnPropNameInTable="MDenColumn" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="dsCombinationV3" targetNamespace="http://tempuri.org/dsCombinationV3.xsd" xmlns:mstns="http://tempuri.org/dsCombinationV3.xsd" xmlns="http://tempuri.org/dsCombinationV3.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Web.config" AppSettingsPropertyName="BVOTEConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="BVOTEConnectionString (Web.config)" ParameterPrefix="@" PropertyReference="AppConfig.System.Configuration.ConfigurationManager.0.ConnectionStrings.BVOTEConnectionString.ConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="dsCombinationV3" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="dsCombinationV3" msprop:Generator_DataSetName="dsCombinationV3" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="p3_Get_RegStatsByCombination" msprop:Generator_UserTableName="p3_Get_RegStatsByCombination" msprop:Generator_RowDeletedName="p3_Get_RegStatsByCombinationRowDeleted" msprop:Generator_TableClassName="p3_Get_RegStatsByCombinationDataTable" msprop:Generator_RowChangedName="p3_Get_RegStatsByCombinationRowChanged" msprop:Generator_RowClassName="p3_Get_RegStatsByCombinationRow" msprop:Generator_RowChangingName="p3_Get_RegStatsByCombinationRowChanging" msprop:Generator_RowEvArgName="p3_Get_RegStatsByCombinationRowChangeEvent" msprop:Generator_RowEvHandlerName="p3_Get_RegStatsByCombinationRowChangeEventHandler" msprop:Generator_TablePropName="p3_Get_RegStatsByCombination" msprop:Generator_TableVarName="tablep3_Get_RegStatsByCombination" msprop:Generator_RowDeletingName="p3_Get_RegStatsByCombinationRowDeleting">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Combination" msprop:Generator_UserColumnName="Combination" msprop:Generator_ColumnPropNameInRow="Combination" msprop:Generator_ColumnVarNameInTable="columnCombination" msprop:Generator_ColumnPropNameInTable="CombinationColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="5" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="MunicipalityName" msprop:Generator_UserColumnName="MunicipalityName" msprop:Generator_ColumnPropNameInRow="MunicipalityName" msprop:Generator_ColumnVarNameInTable="columnMunicipalityName" msprop:Generator_ColumnPropNameInTable="MunicipalityNameColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Regular" msprop:Generator_UserColumnName="Regular" msprop:Generator_ColumnPropNameInRow="Regular" msprop:Generator_ColumnVarNameInTable="columnRegular" msprop:Generator_ColumnPropNameInTable="RegularColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="ByMail" msprop:Generator_UserColumnName="ByMail" msprop:Generator_ColumnPropNameInRow="ByMail" msprop:Generator_ColumnVarNameInTable="columnByMail" msprop:Generator_ColumnPropNameInTable="ByMailColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="Absentee" msprop:Generator_UserColumnName="Absentee" msprop:Generator_ColumnPropNameInRow="Absentee" msprop:Generator_ColumnVarNameInTable="columnAbsentee" msprop:Generator_ColumnPropNameInTable="AbsenteeColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="Personally" msprop:Generator_UserColumnName="Personally" msprop:Generator_ColumnPropNameInRow="Personally" msprop:Generator_ColumnVarNameInTable="columnPersonally" msprop:Generator_ColumnPropNameInTable="PersonallyColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="UkupnoPrebrojano" msdata:ReadOnly="true" msprop:Generator_UserColumnName="UkupnoPrebrojano" msprop:Generator_ColumnPropNameInRow="UkupnoPrebrojano" msprop:Generator_ColumnVarNameInTable="columnUkupnoPrebrojano" msprop:Generator_ColumnPropNameInTable="UkupnoPrebrojanoColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SpremnoZaBrojanje" msdata:ReadOnly="true" msprop:Generator_UserColumnName="SpremnoZaBrojanje" msprop:Generator_ColumnPropNameInRow="SpremnoZaBrojanje" msprop:Generator_ColumnVarNameInTable="columnSpremnoZaBrojanje" msprop:Generator_ColumnPropNameInTable="SpremnoZaBrojanjeColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="PostaPrebrojano" msdata:ReadOnly="true" msprop:Generator_UserColumnName="PostaPrebrojano" msprop:Generator_ColumnPropNameInRow="PostaPrebrojano" msprop:Generator_ColumnVarNameInTable="columnPostaPrebrojano" msprop:Generator_ColumnPropNameInTable="PostaPrebrojanoColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="OdsustvoPrebrojano" msdata:ReadOnly="true" msprop:Generator_UserColumnName="OdsustvoPrebrojano" msprop:Generator_ColumnPropNameInRow="OdsustvoPrebrojano" msprop:Generator_ColumnVarNameInTable="columnOdsustvoPrebrojano" msprop:Generator_ColumnPropNameInTable="OdsustvoPrebrojanoColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="MobilniPrebrojano" msdata:ReadOnly="true" msprop:Generator_UserColumnName="MobilniPrebrojano" msprop:Generator_ColumnPropNameInRow="MobilniPrebrojano" msprop:Generator_ColumnVarNameInTable="columnMobilniPrebrojano" msprop:Generator_ColumnPropNameInTable="MobilniPrebrojanoColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="NepotvrdeniPrebrojano" msdata:ReadOnly="true" msprop:Generator_UserColumnName="NepotvrdeniPrebrojano" msprop:Generator_ColumnPropNameInRow="NepotvrdeniPrebrojano" msprop:Generator_ColumnVarNameInTable="columnNepotvrdeniPrebrojano" msprop:Generator_ColumnPropNameInTable="NepotvrdeniPrebrojanoColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="PostaSpremnoZaBrojanje" msdata:ReadOnly="true" msprop:Generator_UserColumnName="PostaSpremnoZaBrojanje" msprop:Generator_ColumnPropNameInRow="PostaSpremnoZaBrojanje" msprop:Generator_ColumnVarNameInTable="columnPostaSpremnoZaBrojanje" msprop:Generator_ColumnPropNameInTable="PostaSpremnoZaBrojanjeColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="OdsustvoSpremnoZaBrojanje" msdata:ReadOnly="true" msprop:Generator_UserColumnName="OdsustvoSpremnoZaBrojanje" msprop:Generator_ColumnPropNameInRow="OdsustvoSpremnoZaBrojanje" msprop:Generator_ColumnVarNameInTable="columnOdsustvoSpremnoZaBrojanje" msprop:Generator_ColumnPropNameInTable="OdsustvoSpremnoZaBrojanjeColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="MobilniSpremnoZaBrojanje" msdata:ReadOnly="true" msprop:Generator_UserColumnName="MobilniSpremnoZaBrojanje" msprop:Generator_ColumnPropNameInRow="MobilniSpremnoZaBrojanje" msprop:Generator_ColumnVarNameInTable="columnMobilniSpremnoZaBrojanje" msprop:Generator_ColumnPropNameInTable="MobilniSpremnoZaBrojanjeColumn" type="xs:decimal" minOccurs="0" />
+              <xs:element name="NepotvrdeniSpremnoZaBrojanje" msdata:ReadOnly="true" msprop:Generator_UserColumnName="NepotvrdeniSpremnoZaBrojanje" msprop:Generator_ColumnPropNameInRow="NepotvrdeniSpremnoZaBrojanje" msprop:Generator_ColumnVarNameInTable="columnNepotvrdeniSpremnoZaBrojanje" msprop:Generator_ColumnPropNameInTable="NepotvrdeniSpremnoZaBrojanjeColumn" type="xs:decimal" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

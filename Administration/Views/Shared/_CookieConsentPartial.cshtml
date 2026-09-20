@@ -1,0 +1,53 @@
+﻿@using Microsoft.AspNetCore.Http.Features
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IViewLocalizer Localizer
+@{
+    var consentFeature = Context.Features.Get<ITrackingConsentFeature>();
+    var showBanner = !consentFeature?.CanTrack ?? false;
+    var cookieString = consentFeature?.CreateConsentCookie();
+}
+
+@if (showBanner)
+{
+<div class="modal fade" id="cookieConsent" tabindex="-1" aria-labelledby="cookieConsentLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">@Localizer["Centralna izborna komisija Bosne i Hercegovine"]</h5>
+
+      </div>
+      <div class="modal-body">
+        @Localizer["Pristupamo informacijama s vašeg uređaja, kao što su kolačići ili jedinstveni identifikator uređaja, te iste obrađujemo u svrhu sprečavanja zloupotrebe izbornog procesa u Bosni i Hercegovini"]
+      </div>
+      <div class="modal-footer">
+     <a asp-controller="Home" asp-action="Privacy" class="btn btn-secondary" target="_blank">@Localizer["Opširnije"]</a>.
+<button type="button" data-bs-dismiss="modal" class="btn btn-primary accept-policy close" data-cookie-string="@cookieString">@Localizer["Prihvati i zatvori"]</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+       
+           
+
+    <script>
+        (function () {
+            var button = document.querySelector("#cookieConsent button[data-cookie-string]");
+            button.addEventListener("click", function (event) {
+                document.cookie = button.dataset.cookieString;
+				var cookieContainer = document.querySelector("#cookieConsent");
+				cookieContainer.remove();
+            }, false);
+        })();
+
+                 window.onload = function () {
+        OpenBootstrapPopup();
+    };
+    function OpenBootstrapPopup() {
+        $("#cookieConsent").modal('show');
+    }
+    </script>
+}

@@ -1,0 +1,757 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Localization
+@using Newtonsoft.Json
+@inject IViewLocalizer Localizer
+@model IEnumerable<Administration.Models.AspNetUser>
+
+@{
+    ViewData["Title"] = "Administracija";
+    var visible = true;
+    var psActive = "";
+    var candActive = "";
+    var prpActive = "";
+    var booActive = "";
+    var boActive = "";
+    var obsActive = "";
+    var mecActive = "";
+    var comActive = "";
+    if (User.IsInRole("IM_Admin") || User.IsInRole("PS_Admin")) { psActive = "active"; }
+    if (User.IsInRole("CAND_Admin")) { candActive = "active"; }
+    if (User.IsInRole("PRP_Admin")) { prpActive = "active"; }
+    if (User.IsInRole("BOO_Admin")) { booActive = "active"; }
+    if (User.IsInRole("BO_Admin")) { boActive = "active"; }
+    if (User.IsInRole("OBS_Admin")) { obsActive = "active"; }
+    if (User.IsInRole("COM_Admin")) { comActive = "active"; }
+    if (User.IsInRole("MEC_Admin"))
+    {
+        visible = false;
+        mecActive = "active";
+    }
+}
+
+@{
+    List<object> commands = new List<object>();
+    commands.Add(new { type = "ChangePass", buttonOption = new { iconCss = "e-icons fa fa-key fa-lg text-info", cssClass = "e-flat" } }); // custom
+    commands.Add(new { type = "Edit", buttonOption = new { iconCss = "e-icons e-edit", cssClass = "e-flat primary" } });
+    commands.Add(new { type = "Save", buttonOption = new { iconCss = "e-icons e-update", cssClass = "e-flat update-user" } });
+    commands.Add(new { type = "Cancel", buttonOption = new { iconCss = "e-icons e-cancel-icon", cssClass = "e-flat" } });
+    commands.Add(new { type = "Delete", buttonOption = new { iconCss = "e-icons e-delete text-danger", cssClass = "e-flat" } });
+
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+
+    List<object> toolbarItems = new List<object>();
+    toolbarItems.Add(new { text = @Localizer["Novi korisnik"].Value, tooltipText = @Localizer["Novi korisnik"].Value, prefixIcon = "e-add" });
+    // toolbarItems.Add(new { text = @Localizer["Novi korisnik"].Value, tooltipText = @Localizer["Novi korisnik"].Value, prefixIcon = "e-add", id = "add" });
+    // toolbarItems.Add(new { text = @Localizer["Promjena šifre"].Value, tooltipText = @Localizer["Promjena šifre"].Value, prefixIcon = "e-edit", id = "resetpassword" });
+    toolbarItems.Add(new { text = "Search", align = "right", tooltipText = "Search", prefixIcon = "e-expand", id = "expandall" });
+
+    //var DropDownListRoles = new Syncfusion.EJ2.DropDowns.DropDownList() { DataSource = ViewBag.rolesPS, Query = "new ej.data.Query()", AllowFiltering = true, Fields = new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings() { Value = "Value", Text = "Text" } };
+    // var DropDownListParties = new Syncfusion.EJ2.DropDowns.DropDownList() { DataSource = ViewBag.parties1, Query = "new ej.data.Query()", AllowFiltering = true, Fields = new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings() { Value = "Value", Text = "Text" } };
+    // var DropDownListObservers = new Syncfusion.EJ2.DropDowns.DropDownList() { DataSource = ViewBag.observers1, Query = "new ej.data.Query()", AllowFiltering = true, Fields = new Syncfusion.EJ2.DropDowns.DropDownListFieldSettings() { Value = "Value", Text = "Text" } };
+
+    var defaultanimation = new Syncfusion.EJ2.Popups.DialogAnimationSettings { Effect = Syncfusion.EJ2.Popups.DialogEffect.FadeZoom };
+}
+
+<script type="text/javascript">
+    var url = {
+        UpdateUser: '@Url.Action("UpdateUser", "Admin")',
+        InsertUser: '@Url.Action("InsertUser", "Admin")',
+        DeleteUser: '@Url.Action("DeleteUser", "Admin")',
+        CreateMecAdmins: '@Url.Action("CreateMecAdmins", "Admin")',
+        GetPRPUsers: '@Url.Action("GetPRPUsers", "Admin")',
+        GetBOOUsers: '@Url.Action("GetBOOUsers", "Admin")',
+        ChangePass: '@Url.Action("ChangePassword", "Admin")'
+    }
+</script>
+
+<div tabindex="0" class="e-card" id="basic_card">
+    <div class="e-card-header">
+
+        <div class="e-card-header-caption">
+            <div class="e-card-header-title">
+                <h3>
+                    @Localizer["Korisnici"]
+                    @if (User.IsInRole("MEC_Admin"))
+                    {
+                        <span>@ViewBag.munData.Code - @ViewBag.munData.NameLatin</span>
+
+                    }
+                </h3>
+                <span class="e-card-sub-title">@Localizer["Odobravanje korisnika i promjena šifre korisnicima"]</span>
+            </div>
+        </div>
+        @if (User.IsInRole("IM_Admin"))
+        {
+            <div class="page-tools">
+                <div class="action-buttons text-nowrap">
+                    <button class="btn bgc-white btn-light-secondary mx-0" id="createMecAdmins" onclick="createMecAdmins()">
+                        <i class="fa fa-users text-blue-d1"></i>   @Localizer["Kreiraj MEC Admine"]
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <ul class="nav nav-tabs nav-justified nav-tabs-shadow" role="tablist">
+        @if (User.IsInRole("IM_Admin") || User.IsInRole("PS_Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-left @psActive" id="home13-tab-btn" data-toggle="tab" href="#psTab" role="tab" aria-controls="home13" aria-selected="true">
+                    @Localizer["Politički subjekti"]
+                </a>
+
+            </li>
+        }
+        
+        @if (User.IsInRole("IM_Admin") || User.IsInRole("CAND_Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-left @candActive" id="profile13-tab-btn" data-toggle="tab" href="#candTab" role="tab" aria-controls="profile13" aria-selected="false">
+                    @Localizer["Kandidati"]
+                </a>
+            </li>
+        }
+        
+        @if (User.IsInRole("IM_Admin") || User.IsInRole("BOO_Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-left @booActive" id="profile13-tab-btn" data-toggle="tab" href="#booTab" role="tab" aria-controls="profile13" aria-selected="false">
+                    @Localizer["Birački odbori-prijava"]
+                </a>
+            </li>
+        }
+        
+        @if (User.IsInRole("IM_Admin") || User.IsInRole("BO_Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-left @boActive" id="profile13-tab-btn" data-toggle="tab" href="#boTab" role="tab" aria-controls="profile13" aria-selected="false">
+                    @Localizer["Birački odbori"]
+                </a>
+            </li>
+        }
+        
+        @if (User.IsInRole("IM_Admin") || User.IsInRole("OBS_Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-left @obsActive" id="profile13-tab-btn" data-toggle="tab" href="#observersTab" role="tab" aria-controls="profile13" aria-selected="false">
+                    @Localizer["Posmatrači"]
+                </a>
+            </li>
+        }
+        @if (User.IsInRole("IM_Admin") || User.IsInRole("PRP_Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-left @prpActive" id="profile13-tab-btn" data-toggle="tab" href="#bymailTab" role="tab" aria-controls="profile13" aria-selected="false">
+                    @Localizer["Glasači van BiH"]
+                </a>
+            </li>
+        }
+        
+        @if (User.IsInRole("IM_Admin") || User.IsInRole("COM_Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-left @comActive" id="home13-tab-btn" data-toggle="tab" href="#comTab" role="tab" aria-controls="home13" aria-selected="true">
+                    @Localizer["Prigovori i žalbe"]
+                </a>
+
+            </li>
+        }
+        @if (User.IsInRole("MEC_Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-left @mecActive" id="profile13-tab-btn" data-toggle="tab" href="#mecBOTab" role="tab" aria-controls="profile13" aria-selected="false">
+                    @Localizer["OIK - Birački odbori"]
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-left" id="profile13-tab-btn" data-toggle="tab" href="#mecCOMTab" role="tab" aria-controls="profile13" aria-selected="false">
+                    @Localizer["OIK ' Prigovori"]
+                </a>
+            </li>
+        }
+        
+        @if (User.IsInRole("IM_Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-left" id="profile13-tab-btn" data-toggle="tab" href="#adminsTab" role="tab" aria-controls="profile13" aria-selected="false">
+                    @Localizer["Administratori"]
+                </a>
+            </li>
+        }
+    </ul>
+
+    <div class="bgc-white shadow-sm tab-content p-35 border-1 brc-grey-l1">
+        @if (User.IsInRole("IM_Admin") || User.IsInRole("PS_Admin"))
+        {
+            <div class="tab-pane fade text-95 @psActive show" id="psTab" role="tabpanel" aria-labelledby="home13-tab-btn">
+                <div class="e-card-content">
+                    <ejs-grid id="usersPS" dataSource="@ViewBag.usersPS"
+                              toolbar="@(new List<string>() { "Add", "Search" })"
+                              actionComplete="onActionComplete"
+                              allowSorting="true"
+                              commandClick="commandClick"
+                              toolbarClick="toolbarClick"
+                              allowFiltering="true"
+                              allowPaging="true"
+                              locale="@requestCulture.RequestCulture.UICulture.Name">
+                        @*<e-data-manager url="/Admin/UrlDatasource" crudUrl="/Admin/CrudUpdate" adaptor="UrlAdaptor"></e-data-manager>*@
+
+                        <e-grid-editSettings allowEditing="true" allowAdding="true" allowDeleting="true" mode="Dialog"></e-grid-editSettings>
+                        <e-grid-pagesettings pageCount="10 "></e-grid-pagesettings>
+                        <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+
+                        <e-grid-columns>
+                            <e-grid-column headerText="" width="140" commands="commands"></e-grid-column>
+                            <e-grid-column field="Id" headerText="@Localizer["id"].Value" isPrimaryKey="true" visible="false"></e-grid-column>
+
+                            <e-grid-column field="Email" headerText="@Localizer["Email"].Value" validationRules="@(new { required=true})" width="300" isIdentity="false"></e-grid-column>
+                            <e-grid-column field="EmailConfirmed" headerText="@Localizer["Odobren"].Value" width="150" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="RoleId" headerText="@Localizer["Uloga"].Value" editType="dropdownedit" width="200"
+                                           dataSource="@(ViewBag.rolesPS)"
+                                           foreignKeyField="Value" foreignKeyValue="Text">
+                            </e-grid-column>
+                            <e-grid-column field="AccessFailedCount" headerText="@Localizer["Pogresni pokušaji"].Value" width="200"></e-grid-column>
+                            <e-grid-column field="LockoutEnd" headerText="@Localizer["Zaključano do"].Value" editType="datepickeredit" customFormat="@(new {type = "datetime", format = "dd.MM.yyyy" })" width="200"></e-grid-column>
+                            <e-grid-column field="FirstLog" headerText="@Localizer["Promjena šifre nakon prijave"].Value" width="200" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            @*               <e-grid-column field="NameOnballot" headerText="@Localizer["Politički subjekt"].Value" width="250" ></e-grid-column>
+                        <e-grid-column field="NameObserver" headerText="@Localizer["Posmatraci"].Value" width="250"></e-grid-column> *@
+
+                            <e-grid-column field="PartyId"
+                                           headerText="Subjekti"
+                                           editType="dropdownedit"
+                                           dataSource="@(ViewBag.parties)"
+                                           foreignKeyField="Id"
+                                           foreignKeyValue="NameOnballot">
+                            </e-grid-column>
+
+                            @*                         <e-grid-column field="TypeOfApplicationCode" headerText="@Localizer["Tip"].Value"
+                        width="230"
+                        editType="dropdownedit"
+                        dataSource="@(ViewBag.TypeOfApplicationCode)"
+                        foreignKeyField="TypeOfApplicationCode" foreignKeyValue="ApplicationNameB" validationRules="@(new { required= true })">
+                        </e-grid-column> *@
+
+                            @*                        <e-grid-column field="IdObs" headerText="Pomatraci" editType="dropdownedit"
+                        dataSource="@(ViewBag.observers1)" edit="@(new {@params = DropDownListObservers })"
+                        foreignKeyField="Value" foreignKeyValue="Text">
+                        </e-grid-column> *@
+
+                        </e-grid-columns>
+                    </ejs-grid>
+
+                </div>
+            </div>
+        }
+        @if (User.IsInRole("IM_Admin") || User.IsInRole("CAND_Admin"))
+        {
+            <div class="tab-pane fade text-95 show @candActive" id="candTab" role="tabpanel" aria-labelledby="home13-tab-btn">
+
+                <div class="e-card-content">
+                    <ejs-grid id="usersCAND" dataSource="@ViewBag.usersCAND"
+                              toolbar="@(new List<string>() { "Add", "Search" })"
+                              actionComplete="onActionComplete"
+                              allowSorting="true"
+                              commandClick="commandClick"
+                              toolbarClick="toolbarClick"
+                              allowFiltering="true"
+                              allowPaging="true"
+                              locale="@requestCulture.RequestCulture.UICulture.Name">
+                        @*<e-data-manager url="/Admin/UrlDatasource" crudUrl="/Admin/CrudUpdate" adaptor="UrlAdaptor"></e-data-manager>*@
+
+                        <e-grid-editSettings allowEditing="true" allowAdding="true" allowDeleting="true" mode="Dialog"></e-grid-editSettings>
+                        <e-grid-pagesettings pageCount="10 "></e-grid-pagesettings>
+                        <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+
+                        <e-grid-columns>
+                            <e-grid-column headerText="" width="140" commands="commands"></e-grid-column>
+
+                            <e-grid-column field="Id" headerText="@Localizer["id"].Value" isPrimaryKey="true" visible="false"></e-grid-column>
+
+                            <e-grid-column field="Email" headerText="@Localizer["Email"].Value" validationRules="@(new { required=true})" width="300" isIdentity="false"></e-grid-column>
+                            <e-grid-column field="EmailConfirmed" headerText="@Localizer["Odobren"].Value" width="150" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="RoleId" headerText="@Localizer["Uloga"].Value"
+                                           validationRules="@(new { required=true})"
+                                           editType="dropdownedit" width="200"
+                                           dataSource="@(ViewBag.rolesCAND)"
+                                           foreignKeyField="Value" foreignKeyValue="Text">
+                            </e-grid-column>
+                            <e-grid-column field="AccessFailedCount" headerText="@Localizer["Pogresni pokušaji"].Value" width="200"></e-grid-column>
+                            <e-grid-column field="LockoutEnd" headerText="@Localizer["Zaključano do"].Value" editType="datepickeredit" customFormat="@(new {type = "datetime", format = "dd.MM.yyyy" })" width="200"></e-grid-column>
+                            <e-grid-column field="FirstLog" headerText="@Localizer["Promjena šifre nakon prijave"].Value" width="200" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="PartyId"
+                                           headerText="Subjekti"
+                                           validationRules="@(new { required=true})"
+                                           editType="dropdownedit"
+                                           dataSource="@(ViewBag.parties)"
+                                           foreignKeyField="Id"
+                                           foreignKeyValue="NameOnballot">
+                            </e-grid-column>
+
+                            @*                        <e-grid-column field="IdObs" headerText="Pomatraci" editType="dropdownedit"
+                        dataSource="@(ViewBag.observers1)" edit="@(new {@params = DropDownListObservers })"
+                        foreignKeyField="Value" foreignKeyValue="Text">
+                        </e-grid-column> *@
+
+
+                        </e-grid-columns>
+                    </ejs-grid>
+
+                </div>
+            </div>
+        }
+        @if (User.IsInRole("IM_Admin") || User.IsInRole("BOO_Admin"))
+        {
+            <div class="tab-pane fade text-95 show @booActive" id="booTab" role="tabpanel" aria-labelledby="home13-tab-btn">
+                <div class="page-tools">
+                    <div class="action-buttons text-nowrap">
+                        <button class="btn bgc-white btn-light-secondary mx-0" id="getBOOUsers" onclick="getBOOUsers()">
+                            <i class="fa fa-users text-blue-d1"></i>@Localizer["BO korisnici"]
+                        </button>
+                    </div>
+                </div>
+                <div class="e-card-content" style="display:none" id="usersBOOGrid">
+                    <ejs-grid id="usersBOO"
+                              dataSource="@ViewBag.usersBOO"
+                              toolbar="@(new List<string>() { "Add", "Search" })"
+                              actionComplete="onActionComplete"
+                              allowSorting="true"
+                              commandClick="commandClick"
+                              toolbarClick="toolbarClick"
+                              allowFiltering="true"
+                              allowPaging="true"
+                              locale="@requestCulture.RequestCulture.UICulture.Name">
+                        <e-grid-editSettings allowEditing="true" allowAdding="true" allowDeleting="true" mode="Dialog"></e-grid-editSettings>
+                        <e-grid-pagesettings pageCount="10 "></e-grid-pagesettings>
+                        <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+
+                        <e-grid-columns>
+                            <e-grid-column headerText="" width="140" commands="commands"></e-grid-column>
+                            <e-grid-column field="Id" headerText="@Localizer["id"].Value" isPrimaryKey="true" visible="false"></e-grid-column>
+
+                            <e-grid-column field="Email" headerText="@Localizer["Email"].Value" validationRules="@(new { required=true})" width="300" isIdentity="false"></e-grid-column>
+                            <e-grid-column field="EmailConfirmed" headerText="@Localizer["Odobren"].Value" width="150" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="RoleId" headerText="@Localizer["Uloga"].Value" editType="dropdownedit" width="200"
+                                           dataSource="@(ViewBag.rolesBOO)"
+                                           foreignKeyField="Value" foreignKeyValue="Text">
+                            </e-grid-column>
+                            <e-grid-column field="AccessFailedCount" headerText="@Localizer["Pogresni pokušaji"].Value" width="200"></e-grid-column>
+                            <e-grid-column field="LockoutEnd" headerText="@Localizer["Zaključano do"].Value" editType="datepickeredit" type="date" customFormat="@(new {type = "date", format = "dd.MM.yyyy" })" width="200"></e-grid-column>
+                            <e-grid-column field="FirstLog" headerText="@Localizer["Promjena šifre nakon prijave"].Value" width="200" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            @*                        <e-grid-column field="PartyId"
+                        headerText="Subjekti"
+                        editType="dropdownedit"
+                        dataSource="@(ViewBag.parties)"
+                        foreignKeyField="Id"
+                        foreignKeyValue="NameOnballot">
+                        </e-grid-column>
+
+                        <e-grid-column field="MunicipalityId"
+                        headerText="Općine"
+                        editType="dropdownedit"
+                        dataSource="@(ViewBag.Municipalities)"
+                        foreignKeyField="Id"
+                        foreignKeyValue="NameLatin">
+                        </e-grid-column> *@
+
+                        </e-grid-columns>
+                    </ejs-grid>
+
+                </div>
+            </div>
+        }
+        @if (User.IsInRole("IM_Admin") || User.IsInRole("BO_Admin"))
+        {
+            <div class="tab-pane fade text-95 show @boActive" id="boTab" role="tabpanel" aria-labelledby="home13-tab-btn">
+
+                <div class="e-card-content">
+                    <ejs-grid id="usersBO"
+                              dataSource="@ViewBag.usersBO"
+                              toolbar="@(new List<string>() { "Add", "Search" })"
+                              actionComplete="onActionComplete"
+                              allowSorting="true"
+                              commandClick="commandClick"
+                              toolbarClick="toolbarClick"
+                              allowFiltering="true"
+                              allowPaging="true"
+                              locale="@requestCulture.RequestCulture.UICulture.Name">
+                        <e-grid-editSettings allowEditing="true" allowAdding="true" allowDeleting="true" mode="Dialog"></e-grid-editSettings>
+                        <e-grid-pagesettings pageCount="10 "></e-grid-pagesettings>
+                        <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+
+                        <e-grid-columns>
+                            <e-grid-column headerText="" width="140" commands="commands"></e-grid-column>
+                            <e-grid-column field="Id" headerText="@Localizer["id"].Value" isPrimaryKey="true" visible="false"></e-grid-column>
+
+                            <e-grid-column field="Email" headerText="@Localizer["Email"].Value" validationRules="@(new { required=true})" width="300" isIdentity="false"></e-grid-column>
+                            <e-grid-column field="EmailConfirmed" headerText="@Localizer["Odobren"].Value" width="150" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="RoleId" headerText="@Localizer["Uloga"].Value" editType="dropdownedit" width="200"
+                                           dataSource="@(ViewBag.rolesBO)"
+                                           foreignKeyField="Value" foreignKeyValue="Text">
+                            </e-grid-column>
+                            <e-grid-column field="AccessFailedCount" headerText="@Localizer["Pogresni pokušaji"].Value" width="200"></e-grid-column>
+                            <e-grid-column field="LockoutEnd" headerText="@Localizer["Zaključano do"].Value" editType="datepickeredit" type="date" customFormat="@(new {type = "date", format = "dd.MM.yyyy" })" width="200"></e-grid-column>
+                            <e-grid-column field="FirstLog" headerText="@Localizer["Promjena šifre nakon prijave"].Value" width="200" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="PartyId"
+                                           headerText="Subjekti"
+                                           editType="dropdownedit"
+                                           dataSource="@(ViewBag.parties)"
+                                           foreignKeyField="Id"
+                                           foreignKeyValue="NameOnballot">
+                            </e-grid-column>
+
+                            <e-grid-column field="IdMunicipality"
+                                           headerText="Općine"
+                                           editType="dropdownedit"
+                                           dataSource="@(ViewBag.Municipalities)"
+                                           foreignKeyField="Id"
+                                           foreignKeyValue="NameLatin">
+                            </e-grid-column>
+
+                        </e-grid-columns>
+                    </ejs-grid>
+
+                </div>
+            </div>
+        }
+        @if (User.IsInRole("IM_Admin") || User.IsInRole("OBS_Admin"))
+        {
+            <div class="tab-pane fade text-95 show @obsActive" id="observersTab" role="tabpanel" aria-labelledby="home13-tab-btn">
+                <div class="e-card-content">
+                    <ejs-grid id="usersOBS" dataSource="@ViewBag.usersOBS"
+                              toolbar="@(new List<string>() { "Add", "Search" })"
+                              actionComplete="onActionComplete"
+                              allowSorting="true"
+                              commandClick="commandClick"
+                              toolbarClick="toolbarClick"
+                              allowFiltering="true"
+                              allowPaging="true"
+                              locale="@requestCulture.RequestCulture.UICulture.Name">
+                        <e-grid-editSettings allowEditing="true" allowAdding="true" allowDeleting="true" mode="Dialog"></e-grid-editSettings>
+                        <e-grid-pagesettings pageCount="10 "></e-grid-pagesettings>
+                        <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+
+                        <e-grid-columns>
+                            <e-grid-column headerText="" width="140" commands="commands"></e-grid-column>
+                            <e-grid-column field="Id" headerText="@Localizer["id"].Value" isPrimaryKey="true" visible="false"></e-grid-column>
+
+                            <e-grid-column field="Email" headerText="@Localizer["Email"].Value" validationRules="@(new { required=true})" width="300" isIdentity="false"></e-grid-column>
+                            <e-grid-column field="EmailConfirmed" headerText="@Localizer["Odobren"].Value" width="150" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="RoleId" headerText="@Localizer["Uloga"].Value" editType="dropdownedit" width="200"
+                                           dataSource="@(ViewBag.rolesOBS)"
+                                           foreignKeyField="Value" foreignKeyValue="Text">
+                            </e-grid-column>
+                            <e-grid-column field="AccessFailedCount" headerText="@Localizer["Pogresni pokušaji"].Value" width="200"></e-grid-column>
+                            <e-grid-column field="LockoutEnd" headerText="@Localizer["Zaključano do"].Value" editType="datepickeredit" type="date" customFormat="@(new {type = "date", format = "dd.MM.yyyy" })" width="200"></e-grid-column>
+                            <e-grid-column field="FirstLog" headerText="@Localizer["Promjena šifre nakon prijave"].Value" width="200" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="IdObs"
+                                           headerText="Posmatraci"
+                                           editType="dropdownedit"
+                                           dataSource="@(ViewBag.observers)"
+                                           foreignKeyField="Id"
+                                           foreignKeyValue="Name">
+                            </e-grid-column>
+
+                        </e-grid-columns>
+                    </ejs-grid>
+
+                </div>
+            </div>
+        }
+        @if (User.IsInRole("IM_Admin") || User.IsInRole("PRP_Admin"))
+        {
+            <div class="tab-pane fade text-95 show @prpActive" id="bymailTab" role="tabpanel" aria-labelledby="home13-tab-btn">
+                <div class="page-tools">
+                    <div class="action-buttons text-nowrap">
+                        <button class="btn bgc-white btn-light-secondary mx-0" id="getPRPUsers" onclick="getPRPUsers()">
+                            <i class="fa fa-users text-blue-d1"></i>   @Localizer["PRP korisnici"]
+                        </button>
+                    </div>
+                </div>
+                <div class="e-card-content" style="display:none" id="usersPRPGrid">
+                    <ejs-grid id="usersPRP" dataSource="@ViewBag.usersPRP"
+                              toolbar="@(new List<string>() { "Add", "Search" })"
+                              actionComplete="onActionComplete"
+                              allowSorting="true"
+                              commandClick="commandClick"
+                              toolbarClick="toolbarClick"
+                              allowFiltering="true"
+                              allowPaging="true"
+                              locale="@requestCulture.RequestCulture.UICulture.Name">
+                        <e-grid-editSettings allowEditing="true" allowAdding="true" allowDeleting="true" mode="Dialog"></e-grid-editSettings>
+                        <e-grid-pagesettings pageCount="10 "></e-grid-pagesettings>
+                        <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+
+                        <e-grid-columns>
+                            <e-grid-column headerText="" width="140" commands="commands"></e-grid-column>
+
+                            <e-grid-column field="Id" headerText="@Localizer["id"].Value" isPrimaryKey="true" visible="false"></e-grid-column>
+                            <e-grid-column field="Email" headerText="@Localizer["Email"].Value" validationRules="@(new { required=true})" width="300" isIdentity="false"></e-grid-column>
+                            <e-grid-column field="EmailConfirmed" headerText="@Localizer["Odobren"].Value" width="150" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="RoleId" headerText="@Localizer["Uloga"].Value" editType="dropdownedit" width="200"
+                                           dataSource="@(ViewBag.rolesPRP)"
+                                           foreignKeyField="Value" foreignKeyValue="Text">
+                            </e-grid-column>
+                            <e-grid-column field="AccessFailedCount" headerText="@Localizer["Pogresni pokušaji"].Value" width="200"></e-grid-column>
+                            <e-grid-column field="LockoutEnd" headerText="@Localizer["Zaključano do"].Value" editType="datepickeredit" type="date" customFormat="@(new {type = "date", format = "dd.MM.yyyy" })" width="200"></e-grid-column>
+                            <e-grid-column field="FirstLog" headerText="@Localizer["Promjena šifre nakon prijave"].Value" width="200" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+                            <e-grid-column field="ApplicationId" headerText="" visible="true" width="0"></e-grid-column>
+
+                        </e-grid-columns>
+                    </ejs-grid>
+
+                </div>
+            </div>
+        }
+        @if (User.IsInRole("IM_Admin") || User.IsInRole("COM_Admin"))
+        {
+            <div class="tab-pane fade text-95 show @comActive" id="comTab" role="tabpanel" aria-labelledby="home13-tab-btn">
+
+                <div class="e-card-content">
+                    <ejs-grid id="usersCOM"
+                              dataSource="@ViewBag.usersCOM"
+                              toolbar="@(new List<string>() { "Add", "Search" })"
+                              actionComplete="onActionComplete"
+                              allowSorting="true"
+                              commandClick="commandClick"
+                              toolbarClick="toolbarClick"
+                              allowFiltering="true"
+                              allowPaging="true"
+                              locale="@requestCulture.RequestCulture.UICulture.Name">
+                        <e-grid-editSettings allowEditing="true" allowAdding="true" allowDeleting="true" mode="Dialog"></e-grid-editSettings>
+                        <e-grid-pagesettings pageCount="10 "></e-grid-pagesettings>
+                        <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+
+                        <e-grid-columns>
+                            <e-grid-column headerText="" width="140" commands="commands"></e-grid-column>
+                            <e-grid-column field="Id" headerText="@Localizer["id"].Value" isPrimaryKey="true" visible="false"></e-grid-column>
+
+                            <e-grid-column field="Email" headerText="@Localizer["Email"].Value" validationRules="@(new { required=true})" width="300" isIdentity="false"></e-grid-column>
+                            <e-grid-column field="EmailConfirmed" headerText="@Localizer["Odobren"].Value" width="150" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="RoleId" headerText="@Localizer["Uloga"].Value" editType="dropdownedit" width="200"
+                                           dataSource="@(ViewBag.rolesCOM)"
+                                           foreignKeyField="Value" foreignKeyValue="Text">
+                            </e-grid-column>
+                            <e-grid-column field="AccessFailedCount" headerText="@Localizer["Pogresni pokušaji"].Value" width="200"></e-grid-column>
+                            <e-grid-column field="LockoutEnd" headerText="@Localizer["Zaključano do"].Value" editType="datepickeredit" type="date" customFormat="@(new {type = "date", format = "dd.MM.yyyy" })" width="200"></e-grid-column>
+                            <e-grid-column field="FirstLog" headerText="@Localizer["Promjena šifre nakon prijave"].Value" width="200" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="PartyId"
+                                           headerText="Subjekti"
+                                           editType="dropdownedit"
+                                           dataSource="@(ViewBag.parties)"
+                                           foreignKeyField="Id"
+                                           foreignKeyValue="NameOnballot">
+                            </e-grid-column>
+
+                            <e-grid-column field="IdMunicipality"
+                                           headerText="Općine"
+                                           editType="dropdownedit"
+                                           dataSource="@(ViewBag.Municipalities)"
+                                           foreignKeyField="Id"
+                                           foreignKeyValue="NameLatin">
+                            </e-grid-column>
+                            <e-grid-column field="OrgId"
+                                           headerText="Organizacija"
+                                           editType="dropdownedit"
+                                           dataSource="@(ViewBag.Organizations)"
+                                           foreignKeyField="Id"
+                                           foreignKeyValue="Name">
+                            </e-grid-column>
+
+                        </e-grid-columns>
+                    </ejs-grid>
+
+                </div>
+            </div>
+        }
+        @if (User.IsInRole("MEC_Admin"))
+        {
+            <div class="tab-pane fade text-95 show @mecActive" id="mecBOTab" role="tabpanel" aria-labelledby="home13-tab-btn">
+                <div class="e-card-content">
+                    <ejs-grid id="usersBO_MEC" dataSource="@ViewBag.usersBO_MEC"
+                              toolbar="@(new List<string>() { "Add", "Search" })"
+                              actionComplete="onActionComplete"
+                              allowSorting="true"
+                              commandClick="commandClick"
+                              toolbarClick="toolbarClick"
+                              allowFiltering="true"
+                              allowPaging="true"
+                              locale="@requestCulture.RequestCulture.UICulture.Name">
+                        @*<e-data-manager url="/Admin/UrlDatasource" crudUrl="/Admin/CrudUpdate" adaptor="UrlAdaptor"></e-data-manager>*@
+
+                        <e-grid-editSettings allowEditing="true" allowAdding="true" allowDeleting="true" mode="Dialog"></e-grid-editSettings>
+                        <e-grid-pagesettings pageCount="10 "></e-grid-pagesettings>
+                        <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+
+                        <e-grid-columns>
+                            <e-grid-column headerText="" width="140" commands="commands"></e-grid-column>
+
+                            <e-grid-column field="Id" headerText="@Localizer["id"].Value" isPrimaryKey="true" visible="false"></e-grid-column>
+
+                            <e-grid-column field="Email" headerText="@Localizer["Email"].Value" validationRules="@(new { required=true})" width="300" isIdentity="false"></e-grid-column>
+                            <e-grid-column field="EmailConfirmed" headerText="@Localizer["Odobren"].Value" width="150" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="RoleId" headerText="@Localizer["Uloga"].Value" editType="dropdownedit" width="200"
+                                           dataSource="@(ViewBag.rolesBO_MEC)"
+                                           foreignKeyField="Value" foreignKeyValue="Text">
+                            </e-grid-column>
+                            <e-grid-column field="AccessFailedCount" headerText="@Localizer["Pogresni pokušaji"].Value" width="200"></e-grid-column>
+                            <e-grid-column field="LockoutEnd" headerText="@Localizer["Zaključano do"].Value" editType="datepickeredit" type="date" customFormat="@(new {type = "date", format = "dd.MM.yyyy" })" width="200"></e-grid-column>
+                            <e-grid-column field="FirstLog" headerText="@Localizer["Promjena šifre nakon prijave"].Value" width="200" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="IdMunicipality"
+                                           headerText="Opstine"
+                                           visible="@visible"
+                                           editType="dropdownedit"
+                                           dataSource="@(ViewBag.Municipalities)"
+                                           foreignKeyField="Id"
+                                           foreignKeyValue="NameLatin">
+                            </e-grid-column>
+
+                        </e-grid-columns>
+                    </ejs-grid>
+
+                </div>
+            </div>
+            <div class="tab-pane fade text-95 show" id="mecCOMTab" role="tabpanel" aria-labelledby="home13-tab-btn">
+                <div class="e-card-content">
+                    <ejs-grid id="usersCOM_MEC" dataSource="@ViewBag.usersCOM_MEC"
+                              toolbar="@(new List<string>() { "Add", "Search" })"
+                              actionComplete="onActionComplete"
+                              allowSorting="true"
+                              commandClick="commandClick"
+                              toolbarClick="toolbarClick"
+                              allowFiltering="true"
+                              allowPaging="true"
+                              locale="@requestCulture.RequestCulture.UICulture.Name">
+                        @*<e-data-manager url="/Admin/UrlDatasource" crudUrl="/Admin/CrudUpdate" adaptor="UrlAdaptor"></e-data-manager>*@
+
+                        <e-grid-editSettings allowEditing="true" allowAdding="true" allowDeleting="true" mode="Dialog"></e-grid-editSettings>
+                        <e-grid-pagesettings pageCount="10 "></e-grid-pagesettings>
+                        <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+
+                        <e-grid-columns>
+                            <e-grid-column headerText="" width="140" commands="commands"></e-grid-column>
+
+                            <e-grid-column field="Id" headerText="@Localizer["id"].Value" isPrimaryKey="true" visible="false"></e-grid-column>
+
+                            <e-grid-column field="Email" headerText="@Localizer["Email"].Value" validationRules="@(new { required=true})" width="300" isIdentity="false"></e-grid-column>
+                            <e-grid-column field="EmailConfirmed" headerText="@Localizer["Odobren"].Value" width="150" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="RoleId" headerText="@Localizer["Uloga"].Value" editType="dropdownedit" width="200"
+                                           dataSource="@(ViewBag.rolesBO_MEC)"
+                                           foreignKeyField="Value" foreignKeyValue="Text">
+                            </e-grid-column>
+                            <e-grid-column field="AccessFailedCount" headerText="@Localizer["Pogresni pokušaji"].Value" width="200"></e-grid-column>
+                            <e-grid-column field="LockoutEnd" headerText="@Localizer["Zaključano do"].Value" editType="datepickeredit" type="date" customFormat="@(new {type = "date", format = "dd.MM.yyyy" })" width="200"></e-grid-column>
+                            <e-grid-column field="FirstLog" headerText="@Localizer["Promjena šifre nakon prijave"].Value" width="200" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="IdMunicipality"
+                                           headerText="Opstine"
+                                           visible="@visible"
+                                           editType="dropdownedit"
+                                           dataSource="@(ViewBag.Municipalities)"
+                                           foreignKeyField="Id"
+                                           foreignKeyValue="NameLatin">
+                            </e-grid-column>
+
+                        </e-grid-columns>
+                    </ejs-grid>
+
+                </div>
+            </div>
+        }
+        
+        @if (User.IsInRole("IM_Admin"))
+        {
+            <div class="tab-pane fade text-95 show" id="adminsTab" role="tabpanel" aria-labelledby="home13-tab-btn">
+                <div class="e-card-content">
+                    <ejs-grid id="userADMINS" dataSource="@ViewBag.usersADMINS"
+                              toolbar="@(new List<string>() { "Add", "Search" })"
+                              actionComplete="onActionComplete"
+                              allowSorting="true"
+                              commandClick="commandClick"
+                              toolbarClick="toolbarClick"
+                              allowFiltering="true"
+                              allowPaging="true"
+                              locale="@requestCulture.RequestCulture.UICulture.Name">
+                        @*<e-data-manager url="/Admin/UrlDatasource" crudUrl="/Admin/CrudUpdate" adaptor="UrlAdaptor"></e-data-manager>*@
+
+                        <e-grid-editSettings allowEditing="true" allowAdding="true" allowDeleting="true" mode="Dialog"></e-grid-editSettings>
+                        <e-grid-pagesettings pageCount="10 "></e-grid-pagesettings>
+                        <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+
+                        <e-grid-columns>
+                            <e-grid-column headerText="" width="140" commands="commands"></e-grid-column>
+
+                            <e-grid-column field="Id" headerText="@Localizer["id"].Value" isPrimaryKey="true" visible="false"></e-grid-column>
+
+                            <e-grid-column field="Email" headerText="@Localizer["Email"].Value" validationRules="@(new { required=true})" width="300" isIdentity="false"></e-grid-column>
+                            <e-grid-column field="EmailConfirmed" headerText="@Localizer["Odobren"].Value" width="150" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="RoleId" headerText="@Localizer["Uloga"].Value" editType="dropdownedit" width="200"
+                                           dataSource="@(ViewBag.rolesADMINS)"
+                                           foreignKeyField="Value" foreignKeyValue="Text">
+                            </e-grid-column>
+                            <e-grid-column field="AccessFailedCount" headerText="@Localizer["Pogresni pokušaji"].Value" width="200"></e-grid-column>
+                            <e-grid-column field="LockoutEnd" headerText="@Localizer["Zaključano do"].Value" editType="datepickeredit" type="date" customFormat="@(new {type = "date", format = "dd.MM.yyyy" })" width="200"></e-grid-column>
+                            <e-grid-column field="FirstLog" headerText="@Localizer["Promjena šifre nakon prijave"].Value" width="200" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+
+                            <e-grid-column field="IdMunicipality"
+                                           headerText="Opstine"
+                                           visible="@visible"
+                                           editType="dropdownedit"
+                                           dataSource="@(ViewBag.Municipalities)"
+                                           foreignKeyField="Id"
+                                           foreignKeyValue="NameLatin">
+                            </e-grid-column>
+
+                        </e-grid-columns>
+                    </ejs-grid>
+
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script src="~/js/app/admin.js"></script>
+
+@section Scripts
+{
+    <script src="~/lib/bootbox.min.js"></script>
+}
+
+
+<script>
+
+    function onfilteringroles(e) {
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'contains', e.text, true) : query;
+        e.updateData(@Html.Raw(JsonConvert.SerializeObject(ViewBag.roles)), query);
+    }
+
+    function onfilteringparties(e) {
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('NameOnballot', 'contains', e.text, true) : query;
+        e.updateData(@Html.Raw(JsonConvert.SerializeObject(ViewBag.parties)), query);
+    }
+
+    function onfilteringobservers(e) {
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'contains', e.text, true) : query;
+        e.updateData(@Html.Raw(JsonConvert.SerializeObject(ViewBag.observers)), query);
+    }
+</script>

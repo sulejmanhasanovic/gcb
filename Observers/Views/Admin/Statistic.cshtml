@@ -1,0 +1,362 @@
+﻿@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+
+
+
+@inject IViewLocalizer Localizer
+@{
+	ViewData["Title"] = "e-posmatrači Administracija";
+	var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+	List<object> update = new List<object>();
+	update.Add(new { type = "Edit", buttonOption = new { iconCss = "e-icons e-edit text-primary", cssClass = "e-flat text-primary" } });
+	update.Add(new { type = "Delete", buttonOption = new { iconCss = "e-icons e-delete text-danger", cssClass = "e-flat text-danger" } });
+
+}
+
+<script type="text/javascript">
+	var UrlAdmin = {
+		StartDataEntry: '@Url.Action("StartDataEntry", "Admin")',
+		DeleteData: '@Url.Action("DeleteData", "Admin")'
+	};
+		var translations = {
+		DeleteTitle: '@Localizer["Brisanje dokumenta"]',
+		AreYouSure: '@Localizer["Jeste li sigurni?"]',
+		Cancel: '@Localizer["Odustani"]',
+		Delete: '@Localizer["Izbriši"]',
+		SuccessDelete: '@Localizer["Uspješno izbrisano"]',
+		Warning: '@Localizer["UPOZORENJE"]',
+		SaveDataTitle: '@Localizer["Snimanje podataka"]',
+	};
+</script>
+
+<div class="page-header pb-2">
+	<h1 class="page-title text-primary-d2 text-150">
+		@Localizer["Statistika"]
+		<small class=" page-info text-secondary-d2 text-nowrap hidden-xs hidden-sm" id="gr" style="visibility: hidden;"></small>
+		<small class=" page-info text-secondary-d2 text-nowraphidden-xs hidden-sm" id="tp" style="visibility: hidden;"></small>
+	</h1>
+</div>
+<br/>
+	<div class="row">
+		<div class="col-sm-12 infobox-container mb-4">
+			<div style="border-bottom: 2px solid grey; margin-bottom: 10px">
+				<h5><i class="ace-icon fa fa-bar-chart text-blue"></i> @Localizer["Organizacije/Udruženja/Politički subjekti"]</h5>
+			</div>
+			<div class="row">
+				<div class="col-8">
+					<div class="row">
+						@foreach (var item in ViewBag.obs)
+						{
+							<a class="col-6 col-md-6 px-0 mb-2 mb-md-2" href="/Admin/Index/@item.id" style="cursor:pointer; text-decoration: none">
+								<div class="ccard h-100 pt-2 pb-25 px-25 d-flex mx-2 overflow-hidden">
+									@if (@item.id == 1)
+									{
+										<!-- the colored circles on bottom right -->
+										<div class="position-br	mb-n5 mr-n5 radius-round bgc-info-l3 opacity-3" style="width: 5.25rem; height: 5.25rem;"></div>
+										<div class="position-br	mb-n5 mr-n5 radius-round bgc-info-l2 opacity-5" style="width: 4.75rem; height: 4.75rem;"></div>
+										<div class="position-br	mb-n5 mr-n5 radius-round bgc-info-l1 opacity-5" style="width: 4.25rem; height: 4.25rem;"></div>
+									}
+									@if (@item.id == 2)
+									{
+										<!-- the colored circles on bottom right -->
+										<div class="position-br	mb-n5 mr-n5 radius-round bgc-danger-l3 opacity-3" style="width: 5.25rem; height: 5.25rem;"></div>
+										<div class="position-br	mb-n5 mr-n5 radius-round bgc-danger-l2 opacity-5" style="width: 4.75rem; height: 4.75rem;"></div>
+										<div class="position-br	mb-n5 mr-n5 radius-round bgc-danger-l1 opacity-5" style="width: 4.25rem; height: 4.25rem;"></div>
+									}
+
+									@if (@item.id == 3)
+									{
+										<!-- the colored circles on bottom right -->
+										<div class="position-br	mb-n5 mr-n5 radius-round bgc-primary-l3 opacity-3" style="width: 5.25rem; height: 5.25rem;"></div>
+										<div class="position-br	mb-n5 mr-n5 radius-round bgc-primary-l2 opacity-5" style="width: 4.75rem; height: 4.75rem;"></div>
+										<div class="position-br	mb-n5 mr-n5 radius-round bgc-primary-l1 opacity-5" style="width: 4.25rem; height: 4.25rem;"></div>
+									}
+
+									@if (@item.id == 4)
+									{
+										<!-- the colored circles on bottom right -->
+										<div class="position-br	mb-n5 mr-n5 radius-round bgc-success-l3 opacity-3" style="width: 5.25rem; height: 5.25rem;"></div>
+										<div class="position-br	mb-n5 mr-n5 radius-round bgc-success-l2 opacity-5" style="width: 4.75rem; height: 4.75rem;"></div>
+										<div class="position-br	mb-n5 mr-n5 radius-round bgc-success-l1 opacity-5" style="width: 4.25rem; height: 4.25rem;"></div>
+									}
+									<div class="flex-grow-1 pl-25 pos-rel d-flex flex-column">
+										<div class="text-secondary-d4">
+											<span class="text-200" id="IdStatus_@item.id">
+												@item.count
+											</span>
+											@if (@item.id == 1)
+											{
+												<span class="text-md text-info-m1 align-text-bottom text-nowrap" id="Label_@item.id">
+													<i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+												</span>
+											}
+											@if (@item.id == 2)
+											{
+												<span class="text-md text-danger-m1 align-text-bottom text-nowrap" id="Label_@item.id">
+													<i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+												</span>
+											}
+											@if (@item.id == 3)
+											{
+												<span class="text-md text-primary-m1 align-text-bottom text-nowrap" id="Label_@item.id">
+													<i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+												</span>
+											}
+
+											@if (@item.id == 4)
+											{
+												<span class="text-md text-success-m1 align-text-bottom text-nowrap" id="Label_@item.id">
+													<i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+												</span>
+											}
+
+										</div>
+
+										<div class="mt-auto text-nowrap text-secondary-d2 text-105 letter-spacing mt-n1">
+											@item.name
+										</div>
+									</div>
+
+									<div class="ml-auto pr-1 align-self-center pos-rel text-125">
+										<i class="fa fa-envelope text-blue opacity-1 fa-2x mr-25"></i>
+									</div>
+								</div>
+							</a>
+						}
+					</div>
+				</div>
+
+				<div class="col-4">
+					<div class="card ccard h-100 overflow-hidden" id="group_all" style="cursor:pointer">
+						<div class="card-body p-0 bgc-whit flex-grow-1">
+							<div class="d-flex align-items-center justify-content-center flex-wrap h-100">
+								<div class="pos-rel">
+									<div class="position-center text-center text-secondary-d3 mt-n3">
+										<span>
+											ukupno
+										</span>
+
+										<div class="mt-n1 text-180 text-secondary-d4 text-400" id="totatPR">
+											730k
+										</div>
+									</div>
+
+									<canvas id="traffic-source-chart" class="mb-3" style="height: 170px; width: 170px; max-height: 170px; max-width: 170px;"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<br/>
+		<div class="row">
+		<div class="col-sm-6 infobox-container mb-4">
+			<div style="border-bottom: 2px solid grey; margin-bottom: 10px">
+				<h5><i class="ace-icon fa fa-bar-chart text-blue"></i> @Localizer["Statistički pregled subjekata"]</h5>
+			</div>
+
+			<ejs-grid id="gridData" allowFiltering="true" dataSource="@ViewBag.TypeOfOrganizationStat"
+				  allowTextWrap="true" allowResizing="true"
+				  allowTextWrap="true" allowExcelExport="true" allowSorting="true" 
+				  toolbarClick="toolbarClick" toolbar="@(new List<string>() { "ExcelExport", "Search" })" allowPaging="true"
+				  locale="@requestCulture.RequestCulture.UICulture.Name">
+			<e-grid-pagesettings pageCount="10" pageSize="15"></e-grid-pagesettings>
+			<e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+			<e-grid-selectionsettings type="Single"></e-grid-selectionsettings>
+			<e-grid-selectionsettings mode="Row"></e-grid-selectionsettings>
+			<e-grid-columns>
+				<e-grid-column field="Id" headerText="ID" isPrimaryKey="true" width="50px" visible="false"></e-grid-column>
+				<e-grid-column field="NameLatin" headerText="@Localizer["Vrsta organizacije"].Value" width="120px"></e-grid-column>
+				<e-grid-column field="Approved" headerText="@Localizer["Odobreni subjekti"].Value" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit" width="120px"></e-grid-column>
+				<e-grid-column field="Number" headerText="@Localizer["Broj organizacija"].Value" width="140px" textAlign="Center"></e-grid-column>
+			</e-grid-columns>
+		</ejs-grid>
+
+		</div>
+		<div class="col-sm-6 infobox-container mb-4">
+			<div style="border-bottom: 2px solid grey; margin-bottom: 10px">
+				<h5><i class="ace-icon fa fa-bar-chart text-blue"></i> @Localizer["Statistički pregled posmatrača"]</h5>
+			</div>
+				<ejs-grid id="gridDataPersons" allowFiltering="true" dataSource="@ViewBag.TypeOfOrganizationPersonStat"
+				  allowTextWrap="true" allowResizing="true"
+				  allowTextWrap="true" allowExcelExport="true" allowSorting="true" 
+				  toolbarClick="toolbarClick" toolbar="@(new List<string>() { "ExcelExport", "Search" })" allowPaging="true"
+				  locale="@requestCulture.RequestCulture.UICulture.Name">
+			<e-grid-pagesettings pageCount="10" pageSize="15"></e-grid-pagesettings>
+			<e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+			<e-grid-selectionsettings type="Single"></e-grid-selectionsettings>
+			<e-grid-selectionsettings mode="Row"></e-grid-selectionsettings>
+			<e-grid-columns>
+				<e-grid-column field="Id" headerText="ID" isPrimaryKey="true" width="50px" visible="false"></e-grid-column>
+				<e-grid-column field="NameLatin" headerText="@Localizer["Vrsta organizacije"].Value" width="120px"></e-grid-column>
+				<e-grid-column field="Approved" headerText="@Localizer["Odobreni posmatrači"].Value" displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit" width="120px"></e-grid-column>
+				<e-grid-column field="Number" headerText="@Localizer["Broj posmatrača"].Value" width="140px" textAlign="Center"></e-grid-column>
+			</e-grid-columns>
+		</ejs-grid>
+		</div>
+		</div>
+
+
+	@section Scripts
+	{
+
+	<script src="~/lib/ace/Chart.js"></script>
+	<script>
+
+		$(document).ready(function() {
+
+			let utoku = parseInt($("#IdStatus_1").text());
+			let ispunjava = parseInt($("#IdStatus_4").text());
+			let neispunjava = parseInt($("#IdStatus_2").text());
+			let zavrsen = parseInt($("#IdStatus_3").text());
+
+			utoku = utoku ? utoku : 0;
+			ispunjava = ispunjava ? ispunjava : 0;
+			neispunjava = neispunjava ? neispunjava : 0;
+			zavrsen = zavrsen ? zavrsen : 0;
+
+			let total = utoku + ispunjava + neispunjava + zavrsen;
+
+			$("#totatPR").text(total);
+
+
+			let data = [];
+			let utokuPercent = ((utoku / total * 100).toFixed(2));
+			let ispunjavaPercent = ((ispunjava / total * 100).toFixed(2));
+			let neispunjavaPercent = ((neispunjava / total * 100).toFixed(2));
+			let zavrsenPercent = ((zavrsen / total * 100).toFixed(2));
+
+
+			data.push(utokuPercent);
+			data.push(ispunjavaPercent);
+			data.push(neispunjavaPercent);
+			data.push(zavrsenPercent);
+
+
+			$("#Label_1").html(`(+${utokuPercent}% <i class="fa fa-caret-up" aria-hidden="true"></i>)`);
+			$("#Label_2").html(`(-${neispunjavaPercent}% <i class="fa fa-caret-down" aria-hidden="true"></i>)`);
+			$("#Label_3").html(`(+${zavrsenPercent}% <i class="fa fa-caret-up" aria-hidden="true"></i>)`);
+			$("#Label_4").html(`(+${ispunjavaPercent}% <i class="fa fa-caret-up" aria-hidden="true"></i>)`);
+
+			var _animate = !AceApp.Util.isReducedMotion()
+			// Traffic Sources piechart
+			var trafficSourceCanvas = document.getElementById('traffic-source-chart');
+
+			var trafficSourcePieChart = new Chart(trafficSourceCanvas, {
+				type: 'doughnut',
+				data: {
+					datasets: [{
+						label: 'Prijave',
+						data: data,
+						backgroundColor: [
+							"#2488a1",
+							"#548938",
+							"#da3636",
+							"#2d7bcf"
+						],
+					}],
+					labels: [
+						'U toku',
+						'Ispunjava',
+						'Ne ispunjava',
+						'Završen'
+					]
+				},
+
+				options: {
+					responsive: true,
+
+					cutoutPercentage: 70,
+					legend: {
+						display: false
+					},
+					animation: {
+						animateRotate: true,
+						duration: _animate ? 1000 : false
+					},
+					tooltips: {
+						enabled: true,
+						cornerRadius: 0,
+						bodyFontColor: '#fff',
+						bodyFontSize: 14,
+						fontStyle: 'bold',
+
+						backgroundColor: 'rgba(34, 34, 34, 0.73)',
+						borderWidth: 0,
+
+						caretSize: 12,
+
+						xPadding: 22,
+						yPadding: 22,
+
+						callbacks: {
+							label: function(tooltipItem, data) {
+								return data.labels[tooltipItem.index] + ' ' + data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index] + '%'
+							}
+						}
+					}
+				}
+			});
+		});
+
+	</script>
+}
+
+<script>
+		function toolbarClick(args) {
+
+		let gridId = null;
+
+		if (args.item.id.startsWith("gridDataPersons_")) {
+			gridId = "gridDataPersons";
+		}
+		else if (args.item.id.startsWith("gridData_")) {
+			gridId = "gridData";
+		}
+
+		if (!gridId) return;
+
+		var gridObj = document.getElementById(gridId).ej2_instances[0];
+
+		if (args.item.id.endsWith("_excelexport")) {
+			gridObj.excelExport();
+		}
+
+		if (args.item.id.endsWith("_csvexport")) {
+			gridObj.csvExport();
+		}
+
+		if (args.item.id.endsWith("_pdfexport")) {
+			let pdfExportProperties = {
+				theme: {
+					header: {
+						font: new ej.pdfexport.PdfStandardFont(
+							ej.pdfexport.PdfFontFamily.TimesRoman,
+							11
+						),
+						caption: {
+							font: new ej.pdfexport.PdfStandardFont(
+								ej.pdfexport.PdfFontFamily.TimesRoman,
+								9
+							)
+						},
+						record: {
+							font: new ej.pdfexport.PdfStandardFont(
+								ej.pdfexport.PdfFontFamily.TimesRoman,
+								10
+							)
+						}
+					}
+				}
+			};
+
+			gridObj.pdfExport(pdfExportProperties);
+		}
+	}
+</script>
+
+
+

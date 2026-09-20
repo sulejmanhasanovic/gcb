@@ -1,0 +1,23 @@
+﻿@page
+@model ConfirmEmailModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = "Potvrda email-a";
+}
+
+<div class="container">
+    <div class="row-content">
+        <div class="col-md-4 offset-md-4">
+            <section>
+                <h5 class="card-title">@Localizer["Uspješno ste potvrdili email"]</h5>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p>@Localizer["Možete nastaviti sa prijavom na web portal, sa šifrom koju ste dobili na email"]</p>
+                        <p>@Localizer["Ako se u narednih 15 minuta ne prijavite na web portal Centralne izborne komisije vaša prijava će biti izbrisana"]</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

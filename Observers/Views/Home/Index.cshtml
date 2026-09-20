@@ -1,0 +1,49 @@
+﻿@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = "e-Posmatrači";
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+}
+
+<div class="row text-center">
+    <div class="col-lg-8 offset-lg-2">
+        <p>
+            <h4>@Localizer["Elektronska prijava posmatrača"]</h4>
+
+            @Localizer["Servis omogućuje podnošenje zahtjeva za pristup, popunjavanje svih neophodnih podataka i slanje zahtjeva Centralnoj izbornoj komisiji Bosne i Hercegovine"]
+            <br />
+            </p>
+        @switch (requestCulture.RequestCulture.UICulture.Name.ToString())
+        {
+            case "hr-BA":
+                <a href="~/StaticDocuments/Tehnicko_uputstvo_posmatraci_H.pdf" target="_blank">@Localizer["Uputstvo za podnošenje i obradu zahtjeva za akreditaciju posmatrača"]</a>
+                break;
+
+            case "bs-Cyrl-BA":
+                <a href="~/StaticDocuments/Tehnicko_uputstvo_posmatraci_S.pdf" target="_blank">@Localizer["Uputstvo za podnošenje i obradu zahtjeva za akreditaciju posmatrača"]</a>
+                break;
+
+            case "bs-Latn-BA":
+                <a href="~/StaticDocuments/Tehnicko_uputstvo_posmatraci_B.pdf" target="_blank">@Localizer["Uputstvo za podnošenje i obradu zahtjeva za akreditaciju posmatrača"]</a>
+                break;
+            case "en-GB":
+                <a href="~/StaticDocuments/Tehnicko_uputstvo_posmatraci_E.pdf" target="_blank">@Localizer["Uputstvo za podnošenje i obradu zahtjeva za akreditaciju posmatrača"]</a>
+                break;
+        }
+     </div>
+    </div>
+
+<div class="alert alert-warning mt-3 mb-0 text-center" role="alert">
+    @Localizer["upozorenje"]
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-12 text-center">
+        <a class="getstarted" href="/Identity/Account/Register">@Localizer["Registracija"]</a>
+        <a class="btn-learn-more" href="/Identity/Account/Login">@Localizer["Prijava"]</a>
+    </div>
+</div>
+
+

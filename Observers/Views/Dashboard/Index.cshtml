@@ -1,0 +1,2035 @@
+﻿@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Observers.Models
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@inject IViewLocalizer Localizer
+
+@model Observers.Models.Data_AO
+@{
+	ViewData["Title"] = "e-Posmatrači";
+	var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+	var defaultanimation = new Syncfusion.EJ2.Popups.DialogAnimationSettings { Effect = Syncfusion.EJ2.Popups.DialogEffect.FadeZoom };
+	var resizeDirectionHandles = new List<string>() { "All" };
+	var asyncSettingsIdentity = new Syncfusion.EJ2.Inputs.UploaderAsyncSettings { SaveUrl = @Url.Content("~/Dashboard/SaveIdentity"), RemoveUrl = @Url.Content("~/Dashboard/RemoveIdentity") };
+	var asyncSettingsRequest = new Syncfusion.EJ2.Inputs.UploaderAsyncSettings { SaveUrl = @Url.Content("~/Dashboard/SaveRequest"), RemoveUrl = @Url.Content("~/Dashboard/RemoveRequest") };
+	Message message = ViewBag.message;
+
+	List<object> observerCommands = new List<object>();
+	List<object> statusCommands = new List<object>();
+
+	observerCommands.Clear();
+
+	observerCommands.Add(new
+	{
+		type = "Izmjena",
+		buttonOption = new
+		{
+			iconCss = "e-icons e-edit",
+			cssClass = "e-flat btn-edit",
+			title = "Izmjena"
+		}
+	});
+
+	observerCommands.Add(new
+	{
+		type = "Brisanje",
+		buttonOption = new
+		{
+			iconCss = "e-icons e-delete",
+			cssClass = "e-flat btn-delete",
+			title = "Brisanje"
+		}
+	});
+
+	observerCommands.Add(new
+	{
+		type = "Status",
+		buttonOption = new
+		{
+			iconCss = "e-icons e-info fa fa-user-check",
+			cssClass = "e-flat btn-status",
+			title = "Status"
+		}
+	});
+
+	List<object> decisionDelete = new List<object>();
+	decisionDelete.Add(new { type = "Delete", buttonOption = new { iconCss = "e-icons e-delete text-danger", cssClass = "e-flat text-danger" } });
+
+	List<object> decisionPdfAccept = new List<object>();
+	decisionPdfAccept.Add(new
+	{
+		type = "None",
+		buttonOption = new
+		{
+			iconCss = "e-icons e-edit text-primary",
+			cssClass = "e-flat text-primary cmd-decisionapprove"
+		}
+	});
+
+	List<object> decisionPdfReject = new List<object>();
+	decisionPdfReject.Add(new
+	{
+		type = "None",
+		buttonOption = new
+		{
+			iconCss = "e-icons e-edit text-primary",
+			cssClass = "e-flat text-primary cmd-decisionreject"
+		}
+	});
+
+	if (requestCulture?.RequestCulture?.Culture?.Name == "bs-Cyrl-BA"
+		&& !string.IsNullOrEmpty(message?.message))
+	{
+		message.message = Observers.Helpers.Converter
+			.ConvertToCyrillic(message.message)
+			.Replace("<бр />", "<br />");
+	}
+	var readonlyreason = true;
+	@if (!User.IsInRole("CAND_Korisnik") && !User.IsInRole("OBS_Korisnik"))
+	{
+		readonlyreason = false;
+	}
+	
+    var scopes = new List<object>();
+	scopes.Add(new { Text = Localizer["Svi posmatrači"].Value, Value = "" });
+	if (Model.CIK) { scopes.Add(new { Text = Localizer["A) Centralne izborne komisije BiH i Centar za brojanje glasova"].Value, Value = "CIK" }); }
+	// if (Model.OIK) { scopes.Add(new { Text = Localizer["B) Rada izborne komisije"].Value, Value = "OIK" }); }
+	// if (Model.CBS) { scopes.Add(new { Text = Localizer["C) Rada centra za birački spisak"].Value, Value = "CBS" }); }
+	if (Model.BM) { scopes.Add(new { Text = Localizer["B) Izborna komisija, Centar za biračka mjesta i biračka mjesta"].Value, Value = "BM" }); }
+	// if (Model.GCB) { scopes.Add(new { Text = Localizer["E) Rada Glavnog centra za brojanje"].Value, Value = "GCB" }); }
+	if (Model.DKP) { scopes.Add(new { Text = Localizer["C) Biračka mjesta u diplomatsko-konzularnim prestavništvima"].Value, Value = "DKP" }); }
+}
+
+
+
+<script type="text/javascript">
+	var url = {
+		GetDocuments: '@Url.Action("GetDocuments", "Dashboard")',
+		SaveData: '@Url.Action("SaveData", "Dashboard")',
+		SaveDataObserver: '@Url.Action("SaveDataObserver", "Dashboard")',
+		DeleteDataObserver: '@Url.Action("DeleteDataObserver", "Dashboard")',
+		DeleteFile: '@Url.Action("DeleteFile", "Dashboard")',
+		PrintPdf: '@Url.Action("Index", "Pdf", new { target = "_blank" } )',
+		PrintPdfOdluka: '@Url.Action("OdlukaPdf", "Pdf", new { target = "_blank" } )',
+		Logout: '@Url.Action("LogoutJS", "Dashboard")',
+		PrintAll: '@Url.Action("PrintAllDocuments", "Dashboard")',
+		RotateFile: '@Url.Action("RotateFile", "Dashboard")',
+		UpdateObserverPerson: '@Url.Action("UpdateObserverPerson", "Dashboard")',
+		GetObserverPersonMunicipalities: '@Url.Action("GetObserverPersonMunicipalities", "Dashboard")',
+		GetObserverPersonDkp: '@Url.Action("GetObserverPersonDkp", "Dashboard")',
+		InsertObserverPersonMuni: '@Url.Action("InsertObserverPersonMuni", "Dashboard")',
+		InsertObserverPersonDkp: '@Url.Action("InsertObserverPersonDkp", "Dashboard")',
+		DeleteObserverPersonMunicipalities: '@Url.Action("DeleteObserverPersonMunicipalities", "Dashboard")',
+		DeleteObserverPersonDkp: '@Url.Action("DeleteObserverPersonDkp", "Dashboard")',
+		AccreditationPrintSelect: '@Url.Action("AccreditationPrintSelect", "Pdf")',
+		ChangeStatus: '@Url.Action("ChangeStatus", "Dashboard")',
+		GetNextDecisionInfo:'@Url.Action("GetNextDecisionInfo", "Dashboard")',
+		SaveDecision:'@Url.Action("SaveDecision", "Dashboard")',
+		GetDecisionPersonsPreview :'@Url.Action("GetDecisionPersonsPreview", "Dashboard")',
+		PrintDecisionAccept :'@Url.Action("PrintDecisionAccept", "Pdf")',
+		PrintDecisionReject :'@Url.Action("PrintDecisionReject", "Pdf")',
+		DeleteDecision :'@Url.Action("DeleteDecision", "Pdf")',
+		UpdateObserverStatus: '@Url.Action("UpdateObserverStatus", "Dashboard")',
+		PrintDecisionOrganizationReject: '@Url.Action("PrintDecisionOrganizationReject", "Pdf")',
+			ReasonRequired: '@Localizer["Razlog posmatranja je obavezno polje!"]'
+	};
+	var translations = {
+		DeleteTitle: '@Localizer["Brisanje dokumenta"]',
+		AreYouSure: '@Localizer["Jeste li sigurni?"]',
+		Cancel: '@Localizer["Odustani"]',
+		Delete: '@Localizer["Izbriši"]',
+		SuccessDelete: '@Localizer["Uspješno izbrisano"]',
+		DocRequired: '@Localizer["Dokument je obavezan"]',
+		Next: '@Localizer["Naprijed"]',
+		Back: '@Localizer["Nazad"]',
+		Finish: '@Localizer["Podnesi prijavu"]',
+		PrintTitle: '@Localizer["Štampanje obrasca"]',
+		Print: '@Localizer["Štampaj"]',
+		Success: '@Localizer["Uspješno snimljeno"]',
+		Required: '@Localizer["Popunite sva obavezna polja!"]',
+		PrintMessage: '@Localizer["Potrebno je priložiti svojeručno potpisan zahtjev poslije štampanja!"]',
+		DocsRequired: '@Localizer["Učitajte sve obavezne dokumente"]',
+		Continue: '@Localizer["Nastavi sa prijavom"]',
+		CancelFormInput: '@Localizer["Prekini sa prijavom"]',
+		FormIncomplete: '@Localizer["Vaša prijava je nekompletna"]',
+		Warning: '@Localizer["UPOZORENJE"]',
+		NameRequired: '@Localizer["Naziv je obavezno polje!"]',
+		AddressRequired: '@Localizer["Adresa je obavezno polje!"]',
+		EmailRequired: '@Localizer["E-mail je obavezno polje!"]',
+		EmailWrongFormat: '@Localizer["Neispravan email!"]',
+		PhoneRequired: '@Localizer["Telefon je obavezno polje!"]',
+		RequiredField: '@Localizer["Obavezno!"]',
+		DKPRequired: '@Localizer["DKP je obavezno polje!"]',
+		SaveDataTitle: '@Localizer["Snimanje podataka"]',
+		LastNameRequired: '@Localizer["Prezime je obavezno polje!"]',
+		FirstNameRequired: '@Localizer["Ime je obavezno polje!"]',
+		JmbRequired: '@Localizer["JMB je obavezno polje!"]',
+		IdentityIdRequired: '@Localizer["Lična karta je obavezno polje!"]',
+		NotApproved: '@Localizer["Nije odobren"]',
+		NewPerson: '@Localizer["Novi posmatrač"]',
+		ApprovedPerson: '@Localizer["Odobren posmatrač"]',
+		PassportRequired:'@Localizer["Broj pasoša je obavezno polje!"]'
+	};
+
+	let doctypes = '@message.documenttypes';
+</script>
+
+<form method="POST" target="_blank" action="/Pdf" id="printForm">
+	<input type="hidden" id="Id" name="Id" value="@Model.Id" />
+	<input type="hidden" id="SelectedId" name="SelectedId" />
+
+	<input type="hidden" id="AccDate" name="AccDate" value="" />
+	<input type="hidden" id="AccNumber" name="AccNumber" value="" />
+	<input type="hidden" id="AccPs" name="AccPs" value="" />
+	<input type="hidden" id="AccSign" name="AccSign" value="" />
+
+
+	<button type="submit" style="display:none" id="printSubmit">
+	</button>
+</form>
+
+
+<form id="MainData">
+	<div class="row">
+
+		<div class="col-md-8">
+			<h5 class="mb-3"><b>@Localizer["Zahtjev za akreditiranje udruženja građana/međunarodnih organizacija/političkih subjekata"]</b></h5>
+		</div>
+		<div class="col-md-4 text-right">
+			@Localizer["Datum slanja zahtjeva"]: @Model.DateSend
+		</div>
+	</div>
+
+
+	@if (message.show)
+	{
+		<div class="row mt-2">
+			<div class="col-md-12">
+				<div class="@message.css">
+					<h5 class="text-130">@Localizer[@message.title]</h5>
+					<span>
+						@Localizer[@message.message]
+					</span>
+				</div>
+			</div>
+		</div>
+	}
+
+
+	<div class="mt-45 bcard">
+		<ul class="nav nav-justified nav-tabs nav-tabs-simple" role="tablist">
+
+
+			<li class="nav-item mr-1px">
+				<a class="d-style active btn btn-outline-light btn-a-text-dark btn-a-outline-lightgrey bgc-white radius-0 py-2 text-95"
+				   id="home5-tab-btn" data-toggle="tab" href="#tabOrganizations" role="tab" aria-controls="home5" aria-selected="true">
+					<span class="v-active position-tl w-102 border-t-3 brc-orange mt-n3px ml-n1px"></span><!-- show this when active -->
+					<span class="v-n-active v-hover position-tl w-102 border-t-3 brc-orange-tp3 mt-n2px ml-n1px"></span><!-- show this when hovered & NOT active -->
+					1. @Localizer["Podaci o udruženju/organizaciji/političkom subjektu"]
+				</a>
+			</li>
+
+		@*	@if (@Model.Approved)
+			{*@
+				<li class="nav-item mr-1px">
+					<a class="d-style btn btn-outline-light btn-a-text-dark btn-a-outline-lightgrey bgc-white radius-0 py-2 text-95" id="profile5-tab-btn" data-toggle="tab" href="#tabObservers" role="tab" aria-controls="profile5" aria-selected="false">
+						<span class="v-active position-tl w-102 border-t-3 brc-blue mt-n3px ml-n1px"></span>
+						<span class="v-n-active v-hover position-tl w-102 border-t-3 brc-blue-tp3 mt-n2px ml-n1px"></span>
+						2. @Localizer["Podaci o posmatračima"]
+					</a>
+				</li>
+
+			<li class="nav-item mr-1px">
+					<a class="d-style btn btn-outline-light btn-a-text-dark btn-a-outline-lightgrey bgc-white radius-0 py-2 text-95" id="profile5-tab-btn" data-toggle="tab" href="#tabDocuments" role="tab" aria-controls="profile5" aria-selected="false">
+						<span class="v-active position-tl w-102 border-t-3 brc-blue mt-n3px ml-n1px"></span>
+						<span class="v-n-active v-hover position-tl w-102 border-t-3 brc-blue-tp3 mt-n2px ml-n1px"></span>
+						3. @Localizer["Dokumenti"]
+					</a>
+				</li>
+		@*	}*@
+
+		</ul>
+
+
+		<div class="tab-content bgc-white p-35 border-1 brc-grey-l1">
+			@*podaci o udruzenju  tab*@
+			<div class="tab-pane fade show active text-95" id="tabOrganizations" role="tabpanel" aria-labelledby="home5-tab-btn">
+				<div class="col-lg-12 control-section">
+
+			@if(Model.IdStatus<2){
+			<button class="btn btn-outline-info mb-1 float-right" type="button" onclick="saveData(1)">
+				<i class="far fa-save text-140 align-text-bottom mr-1"></i>
+				@Localizer["Snimi podatke"]
+			</button>
+			}
+					<div class="row">
+						<div class="col-md-6">
+							<div class="d-flex flex-wrap gap-3">
+								<div>
+									@Localizer["Vrsta organizacije"]
+								</div>
+								<hr/>
+								@if (Model.AccreditationTypeId == 2)
+{
+								
+								<div class="form-check">
+										<input class="form-check-input big-checkbox" type="radio" asp-for="@Model.AccreditationTypeId" id="bih" value="2" disabled="@Model.Approved">
+									<label class="form-check-label" for="bih">
+										@Localizer["Udruženje građana"]
+									</label>
+								</div>
+}
+								@if (Model.AccreditationTypeId == 3)
+{
+								<div class="form-check">
+										<input class="form-check-input big-checkbox" type="radio" asp-for="@Model.AccreditationTypeId" id="ino" value="3" disabled="@Model.Approved">
+									<label class="form-check-label" for="ino">
+										@Localizer["Međunarodna organizacija"]
+									</label>
+								</div>
+}
+								@if (Model.AccreditationTypeId == 1)
+{
+								<div class="form-check">
+										<input class="form-check-input big-checkbox" type="radio" asp-for="@Model.AccreditationTypeId" id="ps" value="1" disabled="@Model.Approved">
+									<label class="form-check-label" for="ps">
+										@Localizer["Politički subjekt"]
+									</label>
+								</div>
+}
+							</div>
+							<br />
+							<div class="form-floating">
+								<label asp-for="@Model.Name" class="form-label">@Localizer["Naziv"]</label>
+								<input asp-for="@Model.Name" class="form-control form-control-lg" autocomplete="Name" aria-required="true" id="Name" disabled="@Model.Approved" />
+
+								<span asp-validation-for="@Model.Name" class="text-danger"></span>
+							</div>
+							<br />
+
+							<div class="form-floating">
+								<label asp-for="@Model.Address" class="form-label">@Localizer["Kontakt - adresa"]</label>
+								<input asp-for="@Model.Address" class="form-control form-control-lg" autocomplete="Address" aria-required="true" id="Address" disabled="@Model.Approved" />
+
+								<span asp-validation-for="@Model.Address" class="text-danger"></span>
+							</div>
+							<br />
+
+							
+									<div class="form-floating">
+										<label asp-for="@Model.Telephone" class="form-label">@Localizer["Broj telefona / faksa, uključujući i pozivni broj"]</label>
+										<input asp-for="@Model.Telephone" class="form-control form-control-lg" autocomplete="Telephone" aria-required="true" id="Telephone" disabled="@Model.Approved" />
+
+										<span asp-validation-for="@Model.Telephone" class="text-danger"></span>
+									</div>
+								<br/>
+									<div class="form-floating">
+										<label asp-for="@Model.Email" class="form-label">@Localizer["Email"]</label>
+										<input asp-for="@Model.Email" class="form-control form-control-lg" autocomplete="Email" aria-required="true" id="Email" disabled="@Model.Approved" />
+
+										<span asp-validation-for="@Model.Email" class="text-danger"></span>
+									</div>
+								
+
+							<br />
+							
+						</div>
+						<div class="col-md-6">
+							<br />
+							<div class="form-floating p-1">
+								<div>
+									@Localizer["Posmatrači udruženja/organizacije prijavljuju se za posmatranje: (Označite odgovarajući kvadratić pored naziva izborne aktivnosti koju namjeravate posmatrati)"]
+								</div>
+								<div class="form-check">
+									<input class="form-check-input big-checkbox"
+										   type="checkbox"
+										   asp-for="@Model.CIK"
+										   id="cik"
+										   disabled="@Model.Approved">
+
+									<label class="form-check-label" for="cik">
+										@Localizer["A) Centralne izborne komisije BiH i Centar za brojanje glasova"]
+									</label>
+								</div>
+@* 								<div class="form-check">
+									<input class="form-check-input big-checkbox" type="checkbox" asp-for="@Model.OIK" id="oik" disabled="@Model.Approved">
+									<label class="form-check-label" for="oik">
+										@Localizer["B) Izborna komisija, Centar za biračka mjesta i biračka mjesta"]
+									</label>
+								</div> *@
+@* 								<div class="form-check">
+									<input class="form-check-input big-checkbox" type="checkbox" asp-for="@Model.CBS" id="cbs" disabled="@Model.Approved">
+									<label class="form-check-label" for="cbs">
+										@Localizer["C) Rada centra za birački spisak"]
+									</label>
+								</div> *@
+								@if (Model.AccreditationTypeId != 1){
+								<div class="form-check">
+									<input class="form-check-input big-checkbox" type="checkbox" asp-for="@Model.BM" id="bm" disabled="@Model.Approved">
+									<label class="form-check-label" for="bm">
+										@Localizer["B) Izborna komisija, Centar za biračka mjesta i biračka mjesta"]
+									</label>
+								</div>
+								}
+@* 								<div class="form-check">
+									<input class="form-check-input big-checkbox" type="checkbox" asp-for="@Model.GCB" id="gcb" disabled="@Model.Approved">
+									<label class="form-check-label" for="gcb">
+										@Localizer["E) Rada Glavnog centra za brojanje"]
+									</label>
+								</div> *@
+								<div class="form-check">
+									<input class="form-check-input big-checkbox" type="checkbox" asp-for="@Model.DKP" id="dkp" disabled="@Model.Approved">
+									<label class="form-check-label" for="dkp">
+										@Localizer["C) Biračka mjesta u diplomatsko-konzularnim prestavništvima"]
+									</label>
+								</div>
+							</div>
+							<br />
+
+							<div class="form-floating p-1">
+								<div>
+									@Localizer["Jezik za štampanje akreditacija"]
+								</div>
+								<div class="d-flex flex-wrap gap-3">
+								<div class="form-check">
+									<input class="form-check-input big-checkbox" type="radio" asp-for="@Model.Language" id="bs" value="B" disabled="@Model.Approved">
+									<label class="form-check-label" for="bs">
+										@Localizer["Bosanski"]
+									</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input big-checkbox" type="radio" asp-for="@Model.Language" id="hr" value="H" disabled="@Model.Approved">
+									<label class="form-check-label" for="hr">
+										@Localizer["Hrvatski"]
+									</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input big-checkbox" type="radio" asp-for="@Model.Language" id="sr" value="S" disabled="@Model.Approved">
+									<label class="form-check-label" for="sr">
+										@Localizer["Srpski"]
+									</label>
+								</div>
+									<div class="form-check" style="padding-left: 1.95rem;">
+										<input class="form-check-input" type="radio" asp-for="@Model.Language" id="en" value="E" disabled="@Model.Approved">
+										<label class="form-check-label" for="en">
+											@Localizer["Engleski"]
+										</label>
+									</div>
+								</div>
+							</div>
+							<hr/>
+														<br />
+							<div class="form-floating">
+
+								<label asp-for="@Model.Reason" class="form-label">
+									@Localizer["Navedite razloge zbog kojih želite posmatrati izborni proces"]
+									@if (Model.AccreditationTypeId == 2 || Model.AccreditationTypeId == 3)
+									{
+										<span class="text-danger">*</span>
+									}
+								</label>
+@*								<input asp-for="@Model.Reason" class="form-control form-control-lg" autocomplete="Reason" aria-required="true" id="Reason" disabled="@Model.Approved" />
+*@								<textarea asp-for="@Model.Reason" name="Reason" id="Reason" rows="3" disabled="@Model.Approved"  class="form-control form-control-lg"></textarea>
+								<div id="ReasonValidation" class="text-danger mt-1" style="display:none;">
+									@Localizer["Razlog posmatranja je obavezno polje!"]
+								</div>
+								<span asp-validation-for="@Model.Reason" class="text-danger"></span>
+							</div>
+							<br/>
+
+						</div>
+
+					</div>
+
+				</div>
+			</div>
+
+			@*podaci o posmatracima tab*@
+		@*	@if (@Model.Approved)
+			{*@
+			<div class="tab-pane fade text-95" id="tabObservers" role="tabpanel" aria-labelledby="profile5-tab-btn">
+				<div class="container-fluid px-0">
+					<div class="row">
+						<div class="col-12 control-section">
+
+					<!-- ROW 1: Filters (left) + Buttons (right) -->
+					<div class="row align-items-end mb-2">
+
+						<!-- LEFT: Filters -->
+						<div class="col-md-12">
+							<div class="row g-2">
+
+								<!-- Scope -->
+										<div class="col-md-6" style="display:none">
+									<div style="display:none">
+									<label class="form-label mb-1 fw-semibold">
+										@Localizer["Posmatranje izborne aktivnosti"]
+									</label>
+									<ejs-dropdownlist id="ObserverScope"
+													  dataSource="@(scopes)"
+													  placeholder="@Localizer["-- Izaberite --"].Value"
+													  change="ObserverScopeChanged"
+													  popupHeight="350px"
+													  width="100%"
+													  cssClass="e-custom e-ddl-scope">
+
+										<e-dropdownlist-fields text="Text" value="Value"></e-dropdownlist-fields>
+									</ejs-dropdownlist>
+								</div>
+										</div>
+								@if (Model.AccreditationTypeId==1){
+									@if(User.IsInRole("OBS_Admin") || User.IsInRole("PS_Korisnik") || User.IsInRole("Cand_Korisnik") || Model.AccreditationTypeId==1){
+									<!-- Municipality (only for BM) -->
+									<div class="col-md-6" id="pnlFilterMunicipality">
+										<label class="form-label mb-1 fw-semibold">@Localizer["Opština"]</label>
+										<ejs-dropdownlist dataSource="@(ViewBag.Municipalities)"
+														  change="ObserverFilterMuniChange"
+														  popupHeight="220px" width="100%"
+														  id="MunicipalityFilter" name="MunicipalityFilter"
+																	  placeholder="" allowFiltering="true" filtering="municipalityFiltering"
+														  cssClass="e-custom">
+											<e-dropdownlist-fields text="Name" value="Id"></e-dropdownlist-fields>
+										</ejs-dropdownlist>
+									</div>
+									}
+								}
+								<!-- DKP (only for DKP) -->
+								<div class="col-md-6" id="pnlFilterDkp" style="display:none;">
+									<label class="form-label mb-1 fw-semibold">@Localizer["DKP"]</label>
+									<ejs-dropdownlist dataSource="@(ViewBag.Dkp)"
+													  change="ObserverFilterDkpChange"
+													  popupHeight="220px" width="100%"
+													  id="DkpFilter" name="DkpFilter"
+													  placeholder="" allowFiltering="true"
+													  cssClass="e-custom">
+										<e-dropdownlist-fields text="Name" value="Id"></e-dropdownlist-fields>
+									</ejs-dropdownlist>
+								</div>
+
+							</div>
+						</div>
+
+						<!-- RIGHT: Buttons -->
+						<div class="col-md-6">
+							<div class="d-flex justify-content-end align-items-end gap-2 flex-wrap">
+
+								@* @if (Model.IdStatus < 2 || User.IsInRole("OBS_Admin"))
+								{
+									<button class="btn btn-outline-primary mb-1" type="button" id="insertDataButton">
+										<i class="fa fa-plus text-140 align-text-bottom mr-1"></i>
+										@Localizer["Unesi novog posmatrača"]
+									</button>
+								} *@
+
+							</div>
+						</div>
+
+					</div>
+
+					<hr />
+
+							<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+
+								<!-- LIJEVO: ŠTAMPA -->
+								<div class="d-flex align-items-center gap-2 flex-wrap">
+
+									@if (!User.IsInRole("CAND_Korisnik") && !User.IsInRole("OBS_Korisnik") && !User.IsInRole("PS_Korisnik"))
+									{
+										<div id="approvedSection" style="display:@(Model.Approved ? "block" : "none")">
+
+											<div class="d-flex gap-2 flex-wrap">
+
+												<button class="btn btn-outline-success"
+														type="button"
+														onclick="printAccreditation()">
+
+													<i class="fa-solid fa-print text-140 align-text-bottom mr-1"></i>
+													@Localizer["Štampaj sve akreditacije"]
+												</button>
+
+												<button class="btn btn-outline-success"
+														type="button"
+														onclick="printAccreditationSelect()">
+
+													<i class="fa-solid fa-print text-140 align-text-bottom mr-1"></i>
+													@Localizer["Štampaj izabrane akreditacije"]
+												</button>
+
+											</div>
+
+										</div>
+									}
+
+								</div>
+
+								<!-- DESNO: NOVI POSMATRAČ -->
+								<div>
+
+									@if (Model.IdStatus < 2 || User.IsInRole("OBS_Admin"))
+									{
+										<button type="button"
+												class="btn btn-primary"
+												onclick="openObserverModalForNew()">
+
+											<i class="fa fa-user-plus mr-1"></i>
+											@Localizer["Novi posmatrač"]
+										</button>
+									}
+
+								</div>
+
+							</div>
+							
+					<!-- ROW 3: Grid (unchanged) -->
+					<ejs-grid id="gridObservers" allowFiltering="true"
+							  commandClick="commandClick"
+							  rowHeight="40"
+							  width="100%"
+							  allowResizing="true"
+							  dataSource="@ViewBag.ObserverPersons"
+							  allowTextWrap="true" allowExcelExport="true" allowSorting="true"
+							  toolbarClick="toolbarClick"
+							  toolbar="@(new List<string>() { "ExcelExport", "Search" })"
+							  allowSelection="true"
+							  allowPaging="true" locale="@requestCulture.RequestCulture.UICulture.Name">
+
+						<e-grid-pagesettings pageCount="10" pageSize="17"></e-grid-pagesettings>
+						<e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+						<e-grid-selectionsettings type="Single"></e-grid-selectionsettings>
+						<e-grid-selectionsettings mode="Row"></e-grid-selectionsettings>
+						<e-grid-selectionsettings type="Multiple"></e-grid-selectionsettings>
+
+						<e-grid-columns>
+							<e-grid-column field="IdRow" headerText="@Localizer["Id"].Value" width="60px" allowFiltering="false"></e-grid-column>
+							@if (Model.IdStatus < 2 || User.IsInRole("OBS_Admin"))
+							{
+								<e-grid-column headerText="" width="130" commands="observerCommands" allowFiltering="false"></e-grid-column>
+							}
+							<e-grid-column field="Id" headerText="@Localizer["Id"].Value" isPrimaryKey="true" visible="false"></e-grid-column>
+							<e-grid-column field="FirstName" headerText="@Localizer["Ime"].Value" width="150"></e-grid-column>
+							<e-grid-column field="LastName" headerText="@Localizer["Prezime"].Value" width="150"></e-grid-column>
+							@if (Model.AccreditationTypeId == 3)
+							{
+								<e-grid-column field="Passport" headerText="@Localizer["Pasoš"].Value" width="130"></e-grid-column>
+								<e-grid-column field="CountryId" headerText="@Localizer["Država"].Value" visible="false"></e-grid-column>
+								<e-grid-column field="CountryName" headerText="@Localizer["Država"].Value" width="150"></e-grid-column>
+							}
+							else
+							{
+								<e-grid-column field="JMBG" headerText="@Localizer["JMBG"].Value" width="150"></e-grid-column>
+								<e-grid-column field="IdentityId" headerText="@Localizer["Br.LK"].Value" width="130"></e-grid-column>
+
+							}
+							<e-grid-column field="Language" headerText="@Localizer["Jezik"].Value" width="100" allowFiltering="false"></e-grid-column>
+									<e-grid-column headerText="@Localizer["Štampan"].Value" width="150" field="IsPrinted" displayAsCheckBox="true" type="boolean"></e-grid-column>
+
+							<e-grid-column headerText="@Localizer["Status"].Value" width="130" template="#statusTemplate"></e-grid-column>
+							
+							<e-grid-column field="IdReason" visible="false"></e-grid-column>
+@* 							<e-grid-column headerText="@Localizer[""].Value" width="60" commands="statusCommands" allowFiltering="false"></e-grid-column>
+  							<e-grid-column field="ReasonRejected" headerText="@Localizer["Razlog odbijanja"].Value" width="200" visible="false"></e-grid-column>
+ *@							<e-grid-column field="DecisionNumber" headerText="@Localizer["Odluka"].Value" width="140" visible="true"></e-grid-column>
+							<e-grid-column field="CIK" visible="false"></e-grid-column>
+							<e-grid-column field="OIK" visible="false"></e-grid-column>
+							<e-grid-column field="CBS" visible="false"></e-grid-column>
+							<e-grid-column field="BM" visible="false"></e-grid-column>
+							<e-grid-column field="GCB" visible="false"></e-grid-column>
+							<e-grid-column field="DKP" visible="false"></e-grid-column>
+
+							<e-grid-column field="MunicipalitiesId" visible="false"></e-grid-column>
+							<e-grid-column field="DkpId" visible="false"></e-grid-column>
+							<e-grid-column field="MunicipalityName" visible="true" width="150" headerText="@Localizer[""].Value" allowFiltering="false" width="120"></e-grid-column>
+						</e-grid-columns>
+					</ejs-grid>
+
+							<script id="statusTemplate" type="text/x-template">
+								${if(Approved)}
+									<span class="badge bg-success">@Localizer["Odobren"].Value</span>
+								${else if(IsCandidate && IsDuplicate)}
+									<span class="badge bg-danger">@Localizer["Kandidat / Dupli"].Value</span>
+								${else if(IsCandidate)}
+									<span class="badge bg-danger">@Localizer["Kandidat"].Value</span>
+								${else if(IsDuplicate)}
+									<span class="badge bg-warning text-dark">@Localizer["Dupli"].Value</span>
+								${else}
+									<span class="badge bg-danger">@Localizer["Odbijen"].Value</span>
+								${/if}
+							</script>
+				</div>
+			</div>
+			</div>
+				</div>
+		@*	}*@
+
+			<div class="tab-pane fade text-95" id="tabDocuments" role="tabpanel" aria-labelledby="profile5-tab-btn">
+				<div class="col-lg-12 control-section">
+
+					<!-- ROW 1: Buttons right -->
+					<div class="row mb-2">
+						<div class="col-12 d-flex justify-content-end gap-2 flex-wrap">
+							@if (Model.IdStatus < 2)
+							{
+								<button class="btn btn-outline-info mb-1" type="button" onclick="sendData(3)">
+									<i class="fa fa-paper-plane text-140 align-text-bottom mr-1"></i>
+									@Localizer["Pošalji zahtjev"]
+								</button>
+							}
+
+							@if (User.IsInRole("OBS_Admin") || User.IsInRole("OBS_Oik"))
+							{
+								
+								<button class="btn btn-outline-info mb-1" type="button" onclick="saveData(0)">
+									<i class="far fa-save text-140 align-text-bottom mr-1"></i>
+									@Localizer["Snimi podatke"]
+								</button>
+								@if (User.IsInRole("OBS_Admin")){
+								<button class="btn btn-outline-info mb-1" type="button" onclick="changeStatus(1)">
+									<i class="fa fa-lock text-140 align-text-bottom mr-1"></i>
+									@Localizer["Otključaj za ispravku"]
+								</button>
+								<button class="btn btn-outline-info mb-1" type="button" onclick="changeStatus(5)">
+									<i class="fa fa-lock text-140 align-text-bottom mr-1"></i>
+									@Localizer["Otključaj za novi zahtjev"]
+								</button>
+								}
+							}
+
+							<button class="btn btn-outline-success mb-1" type="button" onclick="printPDF()">
+								<i class="fa fa-print text-140 align-text-bottom mr-1"></i>
+								@Localizer["Štampaj zahtjev"]
+							</button>
+						</div>
+					</div>
+
+					<!-- ROW 2: 6 + 6 columns -->
+					<div class="row">
+
+						<!-- LEFT: Documents stacked -->
+						<div class="col-md-6">
+							@if(Model.AccreditationTypeId==2){
+							<div class="fileupload p-3" id="doc1">
+								@Localizer["1. Priložite uvjerenje o registraciji udruženja/međunarodne organizacije"]
+
+								<ejs-uploader id="UploadAttachmentIdentity" removing="onFileRemove" uploading="onFileUpload"
+											  disabled="@Model.Approved"
+											  actionComplete="onSuccess" autoUpload="true"
+											  failure="onUplaodFail"
+											  allowedExtensions=".pdf,.png,.jpg,.jpeg"
+												  dropArea=".control-fluid" maxFileSize="10000000"
+											  asyncSettings="@asyncSettingsIdentity" locale="@requestCulture.RequestCulture.UICulture.Name">
+								</ejs-uploader>
+
+								<div class="message"></div>
+								<div id="documents1"></div>
+							</div>
+
+							<hr class="my-3" />
+							}
+							<div class="fileupload p-3" id="doc2">
+								@Localizer["2. Priložite zahtjev za akreditiranje, skeniran potpisan dokument"]
+
+								<ejs-uploader id="UploadAttachmentRequest" removing="onFileRemove" uploading="onFileUpload"
+											  actionComplete="onSuccess" autoUpload="true"
+											  failure="onUplaodFail"
+											  allowedExtensions=".pdf,.png,.jpg,.jpeg"
+											  dropArea=".control-fluid" maxFileSize="10000000"
+											  asyncSettings="@asyncSettingsRequest" locale="@requestCulture.RequestCulture.UICulture.Name"
+											  buttons="@(new Syncfusion.EJ2.Inputs.UploaderButtonsProps { Browse = Localizer["Učitaj dokument"].Value })">
+								</ejs-uploader>
+
+								<div class="message"></div>
+								<div id="documents2"></div>
+							</div>
+						</div>
+
+						<!-- RIGHT: Checkbox + Textbox + Grid -->
+						<div class="col-md-6">
+							@if (!User.IsInRole("CAND_Korisnik") && !User.IsInRole("OBS_Korisnik"))
+							{
+								<div class="p-3">
+								<div class="mb-3">
+									<label asp-for="IdReason" class="form-label">
+										@Localizer["Razlog odbijanja"].Value
+									</label>
+
+									<ejs-dropdownlist id="IdReason" name="IdReason"
+													  value="@Model.IdReason"
+													  dataSource="@ViewBag.RejectionReason"
+													  placeholder="@Localizer["Odaberite razlog odbijanja"].Value"
+													  popupHeight="220px"
+													  allowFiltering="true">
+										<e-dropdownlist-fields text="Name" value="Id"></e-dropdownlist-fields>
+									</ejs-dropdownlist>
+								</div>
+																						
+									<div class="form-floating mb-3">
+										<label asp-for="@Model.NoOfDecision" class="form-label">@Localizer["Broj protokola"]</label>
+										<input asp-for="@Model.NoOfDecision" class="form-control form-control-lg" autocomplete="NoOfDecision"
+											   aria-required="true" id="NoOfDecision" disabled="@Model.Approved" />
+										<span asp-validation-for="@Model.NoOfDecision" class="text-danger"></span>
+									</div>
+									<div class="form-floating mb-3">
+										<label asp-for="@Model.Comment" class="form-label">
+											@Localizer["Komentar"]
+										</label>
+									    <textarea asp-for="@Model.Comment"
+									              class="form-control"
+									              id="Comment"
+									              style="height:120px"
+									              disabled="@(Model.Approved)">
+									    </textarea>
+
+									</div>
+									<div id="decisionSection" style="display:@(Model.IdReason!=null ? "block" : "none")">
+
+									<button type="button" class="btn btn-outline-primary mb-2" onclick="openDecisionModal()">
+										<i class="fa fa-plus me-1"></i> @Localizer["Dodaj odluku"].Value
+									</button>
+
+									<ejs-grid id="gridAODecisions"
+											  allowFiltering="true"
+											  commandClick="printDecision"
+											  rowHeight="40"
+											  dataSource="@ViewBag.AODecisions"
+											  width="100%"
+											  allowResizing="true"
+											  allowTextWrap="true"
+											  allowSorting="true"
+											  allowPaging="true"
+											  locale="@requestCulture.RequestCulture.UICulture.Name">
+
+										<e-grid-pagesettings pageCount="10" pageSize="7"></e-grid-pagesettings>
+										<e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+										<e-grid-selectionsettings type="Single"></e-grid-selectionsettings>
+										<e-grid-selectionsettings mode="Row"></e-grid-selectionsettings>
+
+										<e-grid-columns>
+											<e-grid-column field="Id" headerText="@Localizer["Id"].Value" isPrimaryKey="true" visible="false"></e-grid-column>
+											<e-grid-column field="DecisionDate" headerText="@Localizer["Datum odluke"].Value" width="150px"></e-grid-column>
+											<e-grid-column field="SessionNumber" headerText="@Localizer["Sjednica"].Value" width="150px"></e-grid-column>
+											<e-grid-column field="DecisionNumber" headerText="@Localizer["Broj odluke"].Value" width="150px"></e-grid-column>
+											<e-grid-column field="NumberOfPerson" headerText="@Localizer["Posmatrači"].Value" width="150px"></e-grid-column>
+											<e-grid-column headerText="" width="60" commands="decisionDelete"></e-grid-column>
+@* 											<e-grid-column headerText="@Localizer["PDF odobreni"].Value" width="60" commands="decisionPdfAccept"></e-grid-column>
+											<e-grid-column headerText="@Localizer["PDF odbijeni"].Value" width="60" commands="decisionPdfReject"></e-grid-column>
+ *@												<e-grid-column headerText="@Localizer["Odluke"].Value"
+															   width="140"
+															   template="#decisionPdfTemplate">
+												</e-grid-column>
+										</e-grid-columns>
+									</ejs-grid>
+										<script id="decisionPdfTemplate" type="text/x-template">
+
+											${if(DecisionTypeId == 1)}
+
+											<div class="d-flex justify-content-center align-items-center" style="gap:6px;">
+												<button type="button"
+														class="btn btn-sm btn-outline-success"
+														title="PDF odobreni"
+														onclick="printDecisionPdf(event, ${Id}, 1)">
+													<i class="fa fa-user-check"></i>
+												</button>
+
+												<button type="button"
+														class="btn btn-sm btn-outline-danger"
+														title="PDF odbijeni"
+														onclick="printDecisionPdf(event, ${Id}, 2)">
+													<i class="fa fa-user-times"></i>
+												</button>
+											</div>
+
+											${else}
+											<div class="d-flex justify-content-center align-items-center" style="gap:6px;">
+												<button  type="button" class="btn btn-sm btn-outline-primary"
+														onclick="printDecisionPdf(event,${Id}, 3)">
+													<i class="fa fa-file-pdf"></i>
+												</button>
+											</div>
+											${/if}
+
+										</script>
+									</div>
+								</div>
+							}
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</form>
+
+<div class="modal fade" id="observerStatusModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<h5 class="modal-title">@Localizer["Status posmatrača"]</h5>
+				<button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">X</button>
+			</div>
+
+			<div class="modal-body">
+				<input type="hidden" id="StatusObserverId" />
+
+				<div class="mb-3">
+					<label class="form-label">@Localizer["Status"]</label>
+
+					<div class="form-check ps-3" style="padding-left: 1.95rem;">
+						<input class="form-check-input" type="checkbox" id="StatusApproved">
+						<label class="form-check-label ms-2" for="StatusApproved">
+							@Localizer["Odobren za posmatranje"]
+						</label>
+					</div>
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label">@Localizer["Razlog odbijanja"]</label>
+					<ejs-dropdownlist id="StatusReasonId"
+									  name="StatusReasonId"
+									  dataSource="@ViewBag.RejectionReasonPersons"
+									  placeholder="@Localizer["Odaberite razlog"].Value"
+									  popupHeight="250px"
+									  allowFiltering="true"
+									  width="100%">
+						<e-dropdownlist-fields text="Name" value="Id"></e-dropdownlist-fields>
+					</ejs-dropdownlist>
+
+					<div id="statusReasonValidation" class="text-danger mt-1" style="display:none;">
+						@Localizer["Razlog je obavezan kada posmatrač nije odobren"].Value
+					</div>
+				</div>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">
+					@Localizer["Zatvori"]
+				</button>
+				<button type="button" class="btn btn-primary" onclick="saveObserverStatus()">
+					@Localizer["Snimi"]
+				</button>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+@*modal success msg*@
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="successModalLabel">@Localizer["CIK BiH"]</h5>
+
+			</div>
+			<div class="modal-body">
+				@*@Localizer["Završili ste unos podataka i prilaganje dokumenata. Vaša prijava je u statusu obrade."]<br />*@
+				@Localizer["Da li ste sigurni da ste završili unos podataka. Nakon što pošaljete podatke nećete biti u mogućnosti praviti izmjene dok Centralna izborna komisija to ne odobri."]
+				<br/>
+				@Localizer["Datum"]: <b>@System.DateTime.Now</b><br />
+				@Localizer["Nakon što Centralna izborna komisija BiH izvrši obradu bit ćete obaviješteni putem e-maila."]
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" onclick="closeModal(0)">@Localizer["Zatvori"]</button>
+				<a style="cursor:pointer" class="btn btn-primary" onclick="saveData(3)">@Localizer["Pošalji zahtjev"]</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="mdlDecision" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<h5 class="modal-title">@Localizer["Nova odluka"]</h5>
+				<button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">X</button>
+			</div>
+
+			<div class="modal-body">
+				<input type="hidden" id="DecisionAccObserverId" value="@Model.Id" />
+				<div id="countPerson">
+				<div class="alert alert-info mb-3" id="decisionPersonInfo">
+					<strong>Broj posmatrača koji će biti ovjereni ovom odlukom:</strong>
+					<span id="decisionPersonCount">0</span>
+				</div>
+				</div>
+				<div class="mb-2">
+					<label class="form-label">@Localizer["Broj odluke"]</label>
+					<input class="form-control" id="DecisionNumberPreview" readonly />
+				</div>
+
+				<div class="row g-2">
+					<div class="col-md-6">
+						<label class="form-label">@Localizer["Datum sjednice"]</label>
+						<input type="date" class="form-control" id="DecisionDate" />
+					</div>
+					<div class="col-md-6">
+						<label class="form-label">@Localizer["Broj sjednice"]</label>
+						<input class="form-control" id="SessionNumber" />
+					</div>
+				</div>
+
+				<div class="text-muted mt-2">
+					<small>@Localizer["Sekvenca će se automatski dodijeliti."]</small>
+				</div>
+				<div id="decisionPersonsSection">
+				<ejs-grid id="gridDecisionPersonsPreview"
+						  height="300"
+						  allowPaging="true"
+						  allowSorting="true"
+						  allowFiltering="true"
+						  locale="@requestCulture.RequestCulture.UICulture.Name">
+					<e-grid-pagesettings pageSize="10" pageCount="5"></e-grid-pagesettings>
+					<e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+
+					<e-grid-columns>
+						<e-grid-column field="LastName" headerText="@Localizer["Prezime"].Value" width="160"></e-grid-column>
+						<e-grid-column field="FirstName" headerText="@Localizer["Ime"].Value" width="160"></e-grid-column>
+						<e-grid-column field="JMBG" headerText="@Localizer["JMBG"].Value" width="160"></e-grid-column>
+						<e-grid-column field="IdentityId" headerText="@Localizer["Br.LK"].Value" width="140"></e-grid-column>
+						<e-grid-column field="Language" headerText="@Localizer["Jezik"].Value" width="100"></e-grid-column>
+					</e-grid-columns>
+				</ejs-grid>
+				</div>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">
+					@Localizer["Zatvori"]
+				</button>
+				<button type="button" class="btn btn-primary" onclick="saveDecision()">
+					@Localizer["Snimi odluku"]
+				</button>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+@*roate doc 1*@
+<div id="target1">
+	<ejs-dialog id="fileDialog1" animationSettings="defaultanimation" width="50%" cssClass="dialogfiles" target="#target1" visible="false"
+				allowDragging="true" resizeHandles="resizeDirectionHandles"
+				showCloseIcon="true" header="CIK BiH">
+		<e-content-template>
+			@if (!User.IsInRole("CAND_Korisnik") && !User.IsInRole("OBS_Korisnik") && !User.IsInRole("PS_Korisnik"))
+			{
+				<div style="width:100%">
+					<div class="btn-group float-right" role="group">
+						<button type="button" class="btn btn-primary" onclick="rotate(1,1)">90°</button>
+						<button type="button" class="btn btn-primary" onclick="rotate(1,2)">180°</button>
+						<button type="button" class="btn btn-primary" onclick="rotate(1,3)">270°</button>
+					</div>
+				</div>
+			}
+			<ejs-pdfviewer id="container1" height="100%"></ejs-pdfviewer>
+		</e-content-template>
+	</ejs-dialog>
+</div>
+
+@*rotate file 2*@
+<div id="target2">
+	<ejs-dialog id="fileDialog2" animationSettings="defaultanimation" width="50%" cssClass="dialogfiles" target="#target2" visible="false"
+				allowDragging="true" resizeHandles="resizeDirectionHandles"
+				showCloseIcon="true" header="CIK BiH">
+		<e-content-template>
+			@if (!User.IsInRole("CAND_Korisnik") && !User.IsInRole("OBS_Korisnik") && !User.IsInRole("PS_Korisnik"))
+			{
+				<div style="width:100%">
+					<div class="btn-group float-right" role="group">
+						<button type="button" class="btn btn-primary" onclick="rotate(2,1)">90°</button>
+						<button type="button" class="btn btn-primary" onclick="rotate(2,2)">180°</button>
+						<button type="button" class="btn btn-primary" onclick="rotate(2,3)">270°</button>
+					</div>
+				</div>
+			}
+			<ejs-pdfviewer id="container2" height="100%"></ejs-pdfviewer>
+		</e-content-template>
+	</ejs-dialog>
+</div>
+
+<!-- modal observer -->
+@if (Model.IdStatus < 2 || User.IsInRole("OBS_Admin"))
+{
+	<div class="modal fade" id="observerModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog observer-modal-dialog" role="document">
+			<div class="modal-content observer-modal-content">
+
+				<div id="ObserverData" onsubmit="return false;">
+
+					<div class="modal-header observer-modal-header">
+						<h5 class="modal-title mb-0">
+							<i class="fa fa-user-plus mr-2"></i>
+							<span id="observerHeaderTitle">@Localizer["Novi posmatrač"].Value</span>
+						</h5>
+
+						<div class="d-flex align-items-center gap-2">
+							<span id="warnDuplicate" class="badge bg-warning text-dark" style="display:none;">
+								⚠ @Localizer["Dupli"].Value
+							</span>
+
+							<span id="warnCandidate" class="badge bg-danger text-white" style="display:none;">
+								❗ @Localizer["Kandidat"].Value
+							</span>
+
+							<button type="button" class="close observer-modal-close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+					</div>
+
+					<div class="modal-body observer-modal-body">
+
+						<input type="hidden" id="ObserverPersonId" />
+
+						<!-- OSNOVNI PODACI -->
+						<div class="observer-section">
+							<div class="observer-section-title">
+								<i class="fa fa-id-card mr-1"></i>
+								@Localizer["Osnovni podaci"]
+							</div>
+
+							<div class="row g-3">
+
+								@if (Model.AccreditationTypeId != 3)
+								{
+									<div class="col-md-8 col-lg-4">
+										<label class="form-label mb-1">
+											@Localizer["JMBG"]
+										</label>
+
+										<div class="input-group" id="JmbgWrap">
+											<input class="form-control form-control-lg"
+												   autocomplete="Jmbg"
+												   aria-required="true"
+												   id="Jmbg" />
+
+											<button type="button"
+													class="btn btn-outline-primary btn-sm px-3"
+													onclick="getDataCbs()">
+												<i class="fa fa-download"></i>
+												CBS
+											</button>
+										</div>
+
+										<small class="text-muted">
+											@Localizer["Unesite JMBG i kliknite CBS."]
+										</small>
+									</div>
+								}
+
+								<div class="col-md-6 col-lg-3">
+									<label class="form-label mb-1">@Localizer["Prezime"]</label>
+									<input class="form-control form-control-lg"
+										   autocomplete="LastName"
+										   aria-required="true"
+										   id="LastName" />
+								</div>
+
+								<div class="col-md-6 col-lg-3">
+									<label class="form-label mb-1">@Localizer["Ime"]</label>
+									<input class="form-control form-control-lg"
+										   autocomplete="FirstName"
+										   aria-required="true"
+										   id="FirstName" />
+								</div>
+
+								@if (Model.AccreditationTypeId == 3)
+								{
+									<div class="col-md-6 col-lg-3">
+										<label class="form-label mb-1">@Localizer["Broj pasoša"]</label>
+										<input class="form-control form-control-lg"
+											   autocomplete="Passport"
+											   aria-required="true"
+											   id="Passport"
+											   name="Passport" />
+									</div>
+
+									<div class="col-md-6 col-lg-3">
+										<label class="form-label mb-1 fw-semibold">@Localizer["Država"]</label>
+										<ejs-dropdownlist dataSource="@(ViewBag.Country)"
+														  popupHeight="220px"
+														  width="100%"
+														  id="CountryId"
+														  name="CountryId"
+														  placeholder=""
+														  allowFiltering="true"
+														  cssClass="e-custom">
+											<e-dropdownlist-fields text="Name" value="Id"></e-dropdownlist-fields>
+										</ejs-dropdownlist>
+									</div>
+								}
+								else
+								{
+									<div class="col-md-6 col-lg-2">
+										<label class="form-label mb-1">
+											@Localizer["Broj važeće lične karte"]
+										</label>
+
+										<input class="form-control form-control-lg"
+											   autocomplete="IdentityId"
+											   aria-required="true"
+											   id="IdentityId" />
+									</div>
+								}
+
+							</div>
+						</div>
+
+						<!-- JEZIK -->
+						<div class="observer-section">
+							<div class="observer-section-title">
+								<i class="fa fa-language mr-1"></i>
+								@Localizer["Jezik za štampanje akreditacija"]
+							</div>
+
+							<div class="language-box">
+								<div class="d-flex flex-wrap gap-4">
+
+									<div class="form-check">
+										<input class="form-check-input big-checkbox"
+											   type="radio"
+											   id="ObsPersonbs"
+											   value="B"
+											   name="ObserverLanguage">
+										<label class="form-check-label" for="ObsPersonbs">
+											@Localizer["Bosanski"]
+										</label>
+									</div>
+
+									<div class="form-check">
+										<input class="form-check-input big-checkbox"
+											   type="radio"
+											   id="ObsPersonhr"
+											   value="H"
+											   name="ObserverLanguage">
+										<label class="form-check-label" for="ObsPersonhr">
+											@Localizer["Hrvatski"]
+										</label>
+									</div>
+
+									<div class="form-check">
+										<input class="form-check-input big-checkbox"
+											   type="radio"
+											   id="ObsPersonsr"
+											   value="S"
+											   name="ObserverLanguage">
+										<label class="form-check-label" for="ObsPersonsr">
+											@Localizer["Srpski"]
+										</label>
+									</div>
+									<div class="form-check">
+										<input class="form-check-input big-checkbox"
+											   type="radio"
+											   id="ObsPersonen"
+											   value="E"
+											   name="ObserverLanguage">
+										<label class="form-check-label" for="ObsPersonen">
+											@Localizer["Engleski"]
+										</label>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+						<!-- AKCIJE -->
+						<div class="observer-actions">
+							<button type="button"
+									class="btn btn-outline-secondary"
+									onclick="clearObserverFields()">
+								@Localizer["Očisti polja"].Value
+							</button>
+
+							<button type="button"
+									class="btn btn-primary"
+									onclick="saveDataObserver()">
+								<i class="fa fa-save mr-1"></i>
+								@Localizer["Unos/Izmjena"].Value
+							</button>
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+	</div>
+}
+<!-- modal observer end -->
+
+<input id="openedDocument" type="hidden" />
+<script>
+	window.documentsState = {
+		1: 0,
+		2: 0
+	};
+</script>
+<script src="~/js/obsupload.js"></script>
+
+@section Scripts
+	{
+
+	<script src="~/lib/jqwidgets/jqwidgets/jqx-all.js"></script>
+	<script src="~/lib/bootbox.min.js"></script>
+	<script src="~/js/obs.js"></script>
+
+	<script>
+
+		$(document).ready(function() {
+
+			$('#obsOik').change(function() {
+				if ($(this).is(":checked")) {
+					$("#pnlMuni").show();
+				} else {
+					$("#pnlMuni").hide();
+				}
+
+			});
+
+
+			$('#obsDkp').change(function() {
+				if ($(this).is(":checked")) {
+					$("#pnlDkp").show();
+				} else {
+					$("#pnlDkp").hide();
+				}
+
+			});
+
+			$('#saveDatails').on('click', function() {
+
+				var sjednicaNumber = $('#sjednicaNumber').val();
+				var sjednicaDate = $('#sjednicaDate').val();
+				var ps = $('#PS').val();
+				var potpis = $('#Sign').val();
+
+
+				if (sjednicaNumber != '') {
+					$('#AccNumber').val(sjednicaNumber);
+				}
+				if (sjednicaDate != '') {
+					$('#AccDate').val(sjednicaDate);
+				}
+				if (ps != '') {
+					$('#AccPs').val(ps);
+				}
+				if (potpis != '') {
+					$('#AccSign').val(potpis);
+				}
+				$('#mdlDetails').modal('toggle');
+			});
+		});
+	</script>
+	}
+
+	<script>
+		function toolbarClick(args) {
+
+			if (args.item.id === 'gridData_pdfexport') {
+				var gridObj = document.getElementById("gridData").ej2_instances[0];
+				let pdfExportProperties = {
+					theme: {
+						header: {
+							font: new ej.pdfexport.PdfStandardFont(ej.pdfexport.PdfFontFamily.TimesRoman, 11),
+							caption: { font: new ej.pdfexport.PdfStandardFont(ej.pdfexport.PdfFontFamily.TimesRoman, 9) },
+							record: { font: new ej.pdfexport.PdfStandardFont(ej.pdfexport.PdfFontFamily.TimesRoman, 10) }
+						}
+					}
+				};
+				gridObj.pdfExport(pdfExportProperties);
+			}
+			if (args.item.id === 'gridData_excelexport') {
+				var gridObj = document.getElementById("gridData").ej2_instances[0];
+				gridObj.excelExport();
+			}
+			if (args.item.id === 'gridData_csvexport') {
+				var gridObj = document.getElementById("gridData").ej2_instances[0];
+				gridObj.csvExport();
+			}
+
+			if (args.item.id === 'gridObservers_pdfexport') {
+				var gridObj = document.getElementById("gridObservers").ej2_instances[0];
+				let pdfExportProperties = {
+					theme: {
+						header: {
+							font: new ej.pdfexport.PdfStandardFont(ej.pdfexport.PdfFontFamily.TimesRoman, 11),
+							caption: { font: new ej.pdfexport.PdfStandardFont(ej.pdfexport.PdfFontFamily.TimesRoman, 9) },
+							record: { font: new ej.pdfexport.PdfStandardFont(ej.pdfexport.PdfFontFamily.TimesRoman, 10) }
+						}
+					}
+				};
+				gridObj.pdfExport(pdfExportProperties);
+			}
+			if (args.item.id === 'gridObservers_excelexport') {
+				var gridObj = document.getElementById("gridObservers").ej2_instances[0];
+				gridObj.excelExport();
+			}
+			if (args.item.id === 'gridObservers_csvexport') {
+				var gridObj = document.getElementById("gridObservers").ej2_instances[0];
+				gridObj.csvExport();
+			}
+		}
+
+	function commandClick(args) {
+
+		const btn = args.target.closest('button');
+		if (!btn) return;
+
+		// ================= DELETE =================
+		if (btn.classList.contains('btn-delete')) {
+
+			bootbox.confirm({
+				closeButton: false,
+				title: "<div><i class='fa fa-exclamation-triangle text-red'></i> " + translations.Warning + "</div>",
+				message: "<div>" + translations.AreYouSure + "</div>",
+				buttons: {
+					cancel: {
+						label: '<i class="fa fa-check"></i> ' + translations.Cancel,
+						className: 'btn-danger'
+					},
+					confirm: {
+						label: '<i class="fa fa-times"></i> ' + translations.Delete,
+						className: 'btn-success'
+					}
+				},
+				callback: function(result) {
+					if (result) {
+						$.ajax({
+							type: "POST",
+							url: url.DeleteDataObserver,
+							data: { id: args.rowData.Id }
+						})
+						.done(function(response) {
+							var grid = document.getElementById("gridObservers").ej2_instances[0];
+							grid.dataSource = response.observerPersons;
+							grid.refresh();
+
+							showMessage(translations.SaveDataTitle, translations.SuccessDelete, 'success');
+						});
+					}
+				}
+			});
+
+			return;
+		}
+
+		// ================= EDIT =================
+		if (btn.classList.contains('btn-edit')) {
+		const row = args.rowData;
+			$('#observerModal').modal('show');
+			$("#observerHeaderTitle").text('@Localizer["Izmjena posmatrača"]');
+		setObserverWarnings(!!row.IsDuplicate, !!row.IsCandidate);
+
+		$("#ObserverPersonId").val(row.Id);
+		$("#FirstName").val(row.FirstName);
+		$("#LastName").val(row.LastName);
+		$("#Jmbg").val(row.Jmbg ?? row.JMBG ?? "");
+		$("#IdentityId").val(row.IdentityId ?? "");
+		$("#Passport").val(row.Passport ?? "");
+
+		$('input:radio[name=ObserverLanguage]').val([row.Language]);
+		suppressObserverFilters = true;
+		setObserverScopeForEdit(row);
+		suppressObserverFilters = false;
+		setObserverApprovalHeader(!!row.Approved, row.ReasonRejected);
+		return;
+	}
+
+		// ================= STATUS =================
+		if (btn.classList.contains('btn-status')) {
+
+			$("#StatusObserverId").val(args.rowData.Id);
+			$("#StatusApproved").prop("checked", !!args.rowData.Approved);
+
+			var ddl = document.getElementById("StatusReasonId")?.ej2_instances?.[0];
+			if (ddl) {
+				ddl.value = args.rowData.IdReason ?? null;
+				ddl.dataBind();
+			}
+
+			$("#observerStatusModal").modal("show");
+
+			return;
+		}
+	}
+
+
+	function getDataCbs() {
+
+		var jmbg = document.getElementById("Jmbg").value;
+
+		fetch('/Dashboard/GetDataCbs?jmbg=' + jmbg)
+			.then(response => {
+				if (!response.ok)
+					throw new Error("Nema podataka");
+				return response.json();
+			})
+			.then(data => {
+				document.getElementById("FirstName").value = data.FirstName;
+				document.getElementById("LastName").value = data.LastName;
+			})
+			.catch(err => {
+				alert(err.message);
+			});
+	}
+
+
+		document.querySelectorAll('a[data-toggle="tab"]').forEach(tab => {
+		tab.addEventListener('shown.bs.tab', function () {
+
+			var grid = document.getElementById("gridObservers")?.ej2_instances?.[0];
+			if (grid) {
+				grid.refresh();
+			}
+
+			var muni = document.getElementById("MunicipalityFilter")?.ej2_instances?.[0];
+			if (muni) muni.refresh();
+
+			var dkp = document.getElementById("DkpFilter")?.ej2_instances?.[0];
+			if (dkp) dkp.refresh();
+		});
+	});
+
+		function ObserverScopeChanged(args) {
+			if (isEditModeScopeSet) return;
+			clearDropdownInvalid("ObserverScope");
+
+			const scope = args.value; 
+			const skipGridFilter = args.skipGridFilter === true;
+			const pnlMuni = document.getElementById("pnlFilterMunicipality");
+			const pnlDkp  = document.getElementById("pnlFilterDkp");
+
+			const muniDDL = document.getElementById("MunicipalityFilter")?.ej2_instances?.[0];
+			const dkpDDL  = document.getElementById("DkpFilter")?.ej2_instances?.[0];
+
+			const grid = document.getElementById("gridObservers")?.ej2_instances?.[0];
+
+			if (pnlMuni) pnlMuni.style.display = "none";
+			if (pnlDkp)  pnlDkp.style.display = "none";
+
+			if (muniDDL) muniDDL.value = null;
+			if (dkpDDL)  dkpDDL.value = null;
+
+			if (!grid) return;
+
+				if (skipGridFilter) {
+			if (scope === "BM" && pnlMuni) pnlMuni.style.display = "";
+			if (scope === "DKP" && pnlDkp) pnlDkp.style.display = "";
+			return;
+	}
+
+		grid.clearFiltering();
+
+		if (!scope) {
+			grid.refresh();
+			return;
+		}
+
+		if (scope === "BM") {
+			if (pnlMuni) pnlMuni.style.display = "";
+		} else if (scope === "DKP") {
+			if (pnlDkp) pnlDkp.style.display = "";
+		}
+
+		switch (scope) {
+			case "CIK": grid.filterByColumn("CIK", "equal", true); break;
+			case "OIK": grid.filterByColumn("OIK", "equal", true); break;
+			case "CBS": grid.filterByColumn("CBS", "equal", true); break;
+			case "BM":  grid.filterByColumn("BM",  "equal", true); break;
+			case "GCB": grid.filterByColumn("GCB", "equal", true); break;
+			case "DKP": grid.filterByColumn("DKP", "equal", true); break;
+		}
+	}
+
+	function ObserverFilterMuniChange(args) {
+		// const grid = document.getElementById("gridObservers")?.ej2_instances?.[0];
+		// if (!grid) return;
+
+		// const val = args?.value;
+
+		// if (!val) {
+		// 	grid.removeFilteredColsByField("MunicipalitiesId");
+		// 	return;
+		// }
+
+		// grid.filterByColumn("MunicipalitiesId", "equal", val*1);
+	}
+
+	function ObserverFilterDkpChange(args) {
+		console.log(isEditModeScopeSet);
+		if (isEditModeScopeSet) return;
+		clearDropdownInvalid("DkpFilter");
+
+		const grid = document.getElementById("gridObservers")?.ej2_instances?.[0];
+		if (!grid) return;
+
+		const val = args?.value;
+
+		if (!val) {
+			grid.removeFilteredColsByField("DkpId");
+			return;
+		}
+
+		grid.filterByColumn("DkpId", "equal", val);
+	}
+
+	function getScopeFromRow(row) {
+		if (row.Bm || row.BM) return "BM";
+		if (row.Dkp || row.DKP) return "DKP";
+		if (row.Cik || row.CIK) return "CIK";
+		if (row.Oik || row.OIK) return "OIK";
+		if (row.Cbs || row.CBS) return "CBS";
+		if (row.Gcb || row.GCB) return "GCB";
+		return "";
+	}
+
+	function setEjsDropdownValue(id, value) {
+		const inst = document.getElementById(id)?.ej2_instances?.[0];
+		if (!inst) return;
+
+		inst.value = null;
+
+		inst.value = value != null ? value.toString() : null;
+
+		inst.dataBind();
+	}
+
+	function clearObserverFields() {
+
+		const $ctx = $('#ObserverData');
+
+		$ctx.find('#ObserverPersonId').val('');
+
+		$ctx.find('#FirstName').val('');
+		$ctx.find('#LastName').val('');
+		$ctx.find('#Jmbg').val('');
+		$ctx.find('#IdentityId').val('');
+		$ctx.find('#PassportAndCountry').val('');
+		$ctx.find('#ReasonRejected').val('');
+
+		$ctx.find('input[name="ObserverLanguage"]').prop('checked', false);
+
+		$ctx.find('#ObsPersonApproved').prop('checked', false);
+
+		$('#dupliAcc').hide();
+		$('#candAcc').hide();
+
+		clearDropdownInvalid("ObserverScope");
+		clearDropdownInvalid("MunicipalityFilter");
+		clearDropdownInvalid("DkpFilter");
+
+		if ($ctx.data('jqxValidator')) {
+			$ctx.jqxValidator('hide');
+		}
+
+		setObserverWarnings(false, false);
+	}
+
+	function openDecisionModal() {
+			const accId = parseInt($("#Id").val(), 10); // ili DecisionAccObserverId
+			const decisionTypeId = getDecisionTypeFromReason();
+
+			if (decisionTypeId === 2) {
+				$("#decisionPersonsSection").hide();
+				$("#decisionPersonInfo").hide();
+			} else {
+				$("#decisionPersonsSection").show();
+				$("#decisionPersonInfo").show();
+				bindDecisionPreviewGrid(accId);
+			}
+			showloader();
+
+			$.ajax({
+				url: url.GetNextDecisionInfo,
+				type: "POST",
+				data: { accreditationObserverId: accId }
+			})
+			.done(function(res){
+				hideloader();
+
+				if (res.status !== "Success") {
+					showMessage(translations.SaveDataTitle, res.message || "Error", "danger");
+					return;
+				}
+
+				$("#DecisionNumberPreview").val(res.decisionNumber);
+				 $("#decisionPersonCount").text(res.numberOfPersons);
+
+						 // Upozorenje ako nema nikog
+		if (res.numberOfPersons === 0) {
+			$("#decisionPersonInfo")
+			  .removeClass("alert-info")
+			  .addClass("alert-warning")
+			  .html("<strong>Nema novih odobrenih posmatrača za ovu odluku.</strong>");
+		} else {
+			$("#decisionPersonInfo")
+			  .removeClass("alert-warning")
+			  .addClass("alert-info")
+			  .html('<strong>Broj posmatrača koji će biti ovjereni ovom odlukom:</strong> <span id="decisionPersonCount">'+res.numberOfPersons+'</span>');
+		}
+
+		// Bind preview grid
+		bindDecisionPreviewGrid(accId);
+
+				$("#DecisionDate").val('');       // ili default today
+				$("#SessionNumber").val('');
+
+				$("#mdlDecision").modal("show");  // bootstrap 4/5 ovisno
+			})
+			.fail(function(xhr){
+				hideloader();
+				showMessage(translations.SaveDataTitle, "Server error", "danger");
+			});
+		}
+
+		function saveDecision() {
+			const accId = parseInt($("#Id").val(), 10);
+			const decisionTypeId =  getDecisionTypeFromReason();
+			const decisionDate = $("#DecisionDate").val();
+			const sessionNumber = $("#SessionNumber").val();
+
+			if (!decisionDate || !sessionNumber) {
+				showMessage(translations.SaveDataTitle, translations.Required, "danger");
+				return;
+			}
+
+			showloader();
+
+			$.ajax({
+				url: url.SaveDecision,
+				type: "POST",
+				contentType: "application/json; charset=utf-8",
+				data: JSON.stringify({
+					AccreditationObserverId: accId,
+					DecisionDate: decisionDate,
+					SessionNumber: sessionNumber,
+					DecisionTypeId:decisionTypeId
+				})
+			})
+			.done(function(res){
+				hideloader();
+
+				if (res.status !== "Success") {
+					showMessage(translations.SaveDataTitle, res.message || "Error", "danger");
+					return;
+				}
+
+				// refresh grid odluka
+				const grid = document.getElementById("gridAODecisions")?.ej2_instances?.[0];
+				if (grid) {
+					grid.dataSource = res.decisions;
+					grid.refresh();
+				}
+
+				$("#mdlDecision").modal("hide");
+				showMessage(translations.SaveDataTitle, translations.Success, "success");
+			})
+			.fail(function(xhr){
+				hideloader();
+				showMessage(translations.SaveDataTitle, "Server error", "danger");
+			});
+		}
+
+	function bindDecisionPreviewGrid(accId) {
+		const grid = document.getElementById("gridDecisionPersonsPreview")?.ej2_instances?.[0];
+		if (!grid) return;
+
+		grid.dataSource = new ej.data.DataManager({
+			url: url.GetDecisionPersonsPreview + "?accreditationObserverId=" + accId,
+			adaptor: new ej.data.UrlAdaptor()
+		});
+
+		grid.query = new ej.data.Query();
+
+		grid.refresh();
+	}
+
+		function printDecision(args) {
+			const accId = parseInt($("#Id").val(), 10);
+			const decisionId = args.rowData.Id;
+			const btn = args.target.closest('button');
+
+		// if (btn.classList.contains('cmd-decisionapprove')) {
+		// 	window.open(
+		// 	url.PrintDecisionAccept + "?decisionId=" + decisionId+ "&observerId="+accId,
+		// 	"_blank"
+		// 	);
+		//  }
+
+		// 		if (btn.classList.contains('cmd-decisionreject')) {
+		// 	window.open(
+		// 	url.PrintDecisionReject + "?decisionId=" + decisionId+ "&observerId="+accId,
+		// 	"_blank"
+		// 	);
+		//  }
+		  if (args.commandColumn.type == "Delete") {
+						bootbox.confirm({
+					closeButton: false,
+					title: "<div><i class='fa fa-exclamation-triangle text-red' aria-hidden='true'></i> " + translations.Warning + "</div>",
+					message: "<div >" + translations.AreYouSure + " </div>",
+					buttons: {
+						cancel: {
+							label: '<i class="fa fa-check"></i> ' + translations.Cancel,
+							className: 'btn-danger'
+						},
+						confirm: {
+							label: '<i class="fa fa-times"></i> ' + translations.Delete,
+							className: 'btn-success'
+						}
+					},
+					callback: function(result) {
+						if (result) {
+							$.ajax({
+								type: "POST",
+								url: url.DeleteDecision,
+								data: { Id: accId, decisionId:decisionId }
+							})
+								.done(function(response) {
+									var grid = document.getElementById("gridAODecisions").ej2_instances[0];
+									grid.dataSource = response.decisionlist;
+									showMessage(translations.SaveDataTitle, translations.SuccessDelete, 'success');
+								})
+								.fail(function(jqXHR, textStatus) {
+									console.log(jqXHR.responseText);
+								});
+						}
+					}
+				});
+		  }
+	}
+
+		function setObserverApprovalHeader(approved, reasonText) {
+		const header = document.getElementById("observerHeader");
+		const title = document.getElementById("observerHeaderTitle");
+		const icon = document.getElementById("observerHeaderIcon");
+
+		if (!header || !title || !icon) return;
+
+		header.classList.remove("header-approved", "header-rejected", "header-neutral");
+		icon.innerHTML = ""; // reset
+
+		if (approved === true) {
+			header.classList.add("header-approved");
+			title.textContent = translations.ApprovedPerson;
+
+			icon.innerHTML = '<i class="fa fa-check-circle"></i>';
+		}
+		else if (approved === false) {
+			header.classList.add("header-rejected");
+			title.textContent = reasonText
+				? translations.NotApproved+" - " + reasonText
+				: translations.NotApproved;
+
+			icon.innerHTML = '<i class="fa fa-times-circle"></i>';
+		}
+		else {
+			header.classList.add("header-neutral");
+			title.textContent = translations.NewPerson;
+
+			icon.innerHTML = '<i class="fa fa-plus-circle"></i>';
+		}
+	}
+
+		function setObserverWarnings(isDuplicate, isCandidate) {
+
+		const dup = document.getElementById("warnDuplicate");
+		const cand = document.getElementById("warnCandidate");
+
+		if (!dup || !cand) return;
+
+		dup.style.display = isDuplicate ? "" : "none";
+		cand.style.display = isCandidate ? "" : "none";
+	}
+
+	
+	function getStatusReasonDdl() {
+		return document.getElementById("StatusReasonId")?.ej2_instances?.[0] ?? null;
+	}
+
+	function clearStatusReasonValidation() {
+		const ddlEl = document.getElementById("StatusReasonId");
+		if (!ddlEl) return;
+
+		const wrapper = ddlEl.closest(".e-control-wrapper");
+		if (wrapper) wrapper.classList.remove("validation-error");
+
+		const msg = document.getElementById("statusReasonValidation");
+		if (msg) msg.style.display = "none";
+	}
+
+	function markStatusReasonValidation() {
+		const ddlEl = document.getElementById("StatusReasonId");
+		if (!ddlEl) return;
+
+		const wrapper = ddlEl.closest(".e-control-wrapper");
+		if (wrapper) wrapper.classList.add("validation-error");
+
+		const msg = document.getElementById("statusReasonValidation");
+		if (msg) msg.style.display = "block";
+	}
+
+	function toggleStatusReasonByApproved() {
+		const approved = $("#StatusApproved").is(":checked");
+		const ddl = getStatusReasonDdl();
+
+		clearStatusReasonValidation();
+
+		if (!ddl) return;
+
+		if (approved) {
+			ddl.value = null;
+			ddl.text = null;
+			ddl.dataBind();
+		}
+	}
+
+	function saveObserverStatus() {
+		var id = parseInt($("#StatusObserverId").val(), 10);
+		var approved = $("#StatusApproved").is(":checked");
+
+		var ddl = getStatusReasonDdl();
+		var idReason = ddl ? ddl.value : null;
+
+		clearStatusReasonValidation();
+
+		if (!approved && (!idReason || idReason === "")) {
+			markStatusReasonValidation();
+			showMessage(translations.SaveDataTitle, "Razlog je obavezan kada posmatrač nije odobren.", "danger");
+			return;
+		}
+
+		if (approved && ddl) {
+			ddl.value = null;
+			ddl.text = null;
+			ddl.dataBind();
+			idReason = null;
+		}
+
+		$.ajax({
+			url: url.UpdateObserverStatus,
+			type: 'POST',
+			contentType: 'application/json; charset=utf-8',
+			data: JSON.stringify({
+				id: id,
+				approved: approved,
+				idReason: idReason
+			})
+		})
+		.done(function (result) {
+			if (result.status === "Success") {
+				var grid = document.getElementById("gridObservers")?.ej2_instances?.[0];
+				if (grid) {
+					grid.dataSource = result.observerPersons;
+					grid.refresh();
+				}
+
+				$("#observerStatusModal").modal("hide");
+				showMessage(translations.SaveDataTitle, translations.Success, 'success');
+			}
+		})
+		.fail(function (xhr) {
+			console.log(xhr);
+			showMessage(translations.SaveDataTitle, "Server error", "danger");
+		});
+	}
+
+		function setObserverScopeForEdit(row) {
+		const scope = getScopeFromRow(row);
+
+		isEditModeScopeSet = true;
+		setEjsDropdownValue("ObserverScope", scope);
+		isEditModeScopeSet = false;
+
+		$("#pnlFilterMunicipality").hide();
+		$("#pnlFilterDkp").hide();
+
+		setEjsDropdownValue("MunicipalityFilter", null);
+		setEjsDropdownValue("DkpFilter", null);
+
+		if (scope === "BM") {
+			$("#pnlFilterMunicipality").show();
+			setEjsDropdownValue("MunicipalityFilter", row.MunicipalitiesId ?? null);
+		}
+
+		if (scope === "DKP") {
+			$("#pnlFilterDkp").show();
+			setEjsDropdownValue("DkpFilter", row.DkpId ?? null);
+		}
+	}
+
+		function openObserverModalForNew() {
+		clearObserverFields();
+
+		$("#observerHeaderTitle").text('@Localizer["Novi posmatrač"]');
+		$("#warnDuplicate").hide();
+		$("#warnCandidate").hide();
+
+		$("#observerModal").modal("show");
+
+		setTimeout(function () {
+			document.getElementById("CountryId")?.ej2_instances?.[0]?.refresh();
+			$("#LastName").focus();
+		}, 200);
+	}
+
+		function openOrganizationRejectDecisionModal() {
+		$("#DecisionTypeId").val("2");
+		$("#decisionPersonsSection").hide();
+		$("#countPerson").hide();
+
+		openDecisionModal();
+	}
+
+	function printDecisionPdf(e,decisionId, type) {
+		if (e) {
+			e.preventDefault();
+			e.stopPropagation();
+		}
+		const accId = parseInt($("#Id").val(), 10);
+
+		if (type === 1) {
+			window.open(
+				url.PrintDecisionAccept + "?decisionId=" + decisionId + "&observerId=" + accId,
+				"_blank"
+			);
+			return;
+		}
+
+		if (type === 2) {
+			window.open(
+				url.PrintDecisionReject + "?decisionId=" + decisionId + "&observerId=" + accId,
+				"_blank"
+			);
+			return;
+		}
+
+		if (type === 3) {
+			window.open(
+				url.PrintDecisionOrganizationReject + "?decisionId=" + decisionId + "&observerId=" + accId,
+				"_blank"
+			);
+		}
+	}
+
+		function getDecisionTypeFromReason() {
+			const ddl = document.getElementById("IdReason")?.ej2_instances?.[0];
+			const idReason = ddl ? parseInt(ddl.value, 10) : null;
+			return idReason === 1 ? 1 : 2;
+	}
+
+		function municipalityFiltering(args) {
+
+		var query = new ej.data.Query();
+
+		if (args.text) {
+			query = query.where("Name", "contains", args.text, true);
+		}
+
+		args.updateData(args.dataSource, query);
+	}
+	</script>

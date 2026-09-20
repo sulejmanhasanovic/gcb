@@ -1,0 +1,45 @@
+﻿@model InputModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Localization
+@using static IdentityManager.Areas.Identity.Pages.Account.RegisterModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+@{
+    ViewData["Title"] = "CIK BiH";
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+}
+
+<div class="container">
+	<div class="row-content">
+		<div class="col-md-4 offset-md-4">
+			<section>
+				@if (ViewBag.CheckType=="Registration"){
+				 <div class="text-center">
+					 @localizer["Obrazac s podacima koje ste unijeli je već dostavljen. Ako ste vi podnijeli obrazac prijavite se, a ako niste, podnesite zahtjev za uvid u podatke"]
+       <br/>
+					 <a class="w-100 btn-primary_"  asp-area="Identity" asp-page="/Account/Login">@localizer["Prijava"]</a>
+    </div>
+	<hr/>
+		 <div class="text-center">
+			 <form action="/Home/Check">
+				 <input type="hidden" id="FirstName" name="FirstName" value="@Model.FirstName" />
+				 <input type="hidden" id="LastName" name="LastName" value="@Model.LastName" />
+				 <input type="hidden" id="JMBG" name="JMBG" value="@Model.JMBG" />
+				 <input type="hidden" id="Email" name="Email" value="@Model.Email" />
+				 <input type="hidden" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" />
+				 <button type="submit" class="w-100 btn-primary h45">@localizer["Zahtjev za uvid u podatke"]</button>
+			 </form>
+    </div>
+	}
+	@if(ViewBag.CheckType=="Login"){
+		 <div class="text-center">
+					 @localizer["Korisnik sa unesenim podacima nema otvoren nalog, provjerite unesene podatke ili izvršite otvaranje naloga na sljedećoj formi"]
+       <br/>
+					 <a class="w-100 btn-primary_"  asp-area="Identity" asp-page="/Account/Register">@localizer["Otvaranje korisničkog naloga za elektronski pristup"]</a>
+					 
+					 
+    </div>
+	}
+				</section>
+				</div>
+				</div>
+				</div>

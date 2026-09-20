@@ -1,0 +1,290 @@
+﻿@model Observers.Models.PdfDecisionReject
+
+@{
+    Layout = "";
+}
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var culture = requestCulture.RequestCulture.Culture;
+
+    var organizationName = Model.Organization.Name;
+    var accreditationTypeId = Model.Organization.AccreditationTypeId;
+
+    var key = $"AccType_{accreditationTypeId}";
+    var opcija = Localizer[key];
+
+    var organizationDisplayName = culture?.Name == "bs-Cyrl-BA"
+        ? Observers.Helpers.Converter.ConvertToCyrillic(organizationName)
+        : organizationName;
+}
+
+<style type="text/css">
+    html * {
+        color: #000 !important;
+        font-family: "Times New Roman", Times, serif !important;
+        line-height: 1.4;
+        letter-spacing: 0.5px !important;
+    }
+
+    body {
+        text-rendering: optimizeLegibility;
+    }
+
+    .border-bottom {
+        border-bottom: 1px solid black !important;
+    }
+
+    .celltransparent {
+        border: none;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .w40 { width: 40%; }
+    .w60 { width: 60%; }
+    .w90 { width: 90%; }
+
+    .center { text-align: center; }
+    .left { text-align: left; }
+
+    .avoid {
+        page-break-inside: avoid !important;
+        margin: 4px 0 4px 0;
+    }
+
+    p {
+        line-height: 1.5;
+        margin: 4px 0;
+    }
+
+    .observers-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        margin-top: 5px;
+        margin-bottom: 10px;
+    }
+
+    .observers-table td {
+        border: 1px solid #333;
+        padding: 5px;
+        vertical-align: top;
+    }
+
+    .obs-rb {
+        width: 8%;
+        text-align: center;
+    }
+
+    .obs-name {
+        width: 52%;
+        text-align: left;
+    }
+
+    .obs-type {
+        width: 40%;
+        text-align: left;
+    }
+</style>
+
+<div>
+    <table style="width:100%;" class="border-bottom">
+        <tr>
+            <td style="text-align:center">
+                BOSNA I HERCEGOVINA
+                <br />
+                CENTRALNA IZBORNA KOMISIJA
+                <br />
+                SREDIŠNJE IZBORNO POVJERENSTVO
+            </td>
+            <td style="width:100px; text-align:center">
+                <img src="@(Model.path)" />
+            </td>
+            <td style="text-align:center">
+                БОСНА И ХЕРЦЕГОВИНА
+                <br />
+                ЦЕНТРАЛНА ИЗБОРНА КОМИСИЈА
+            </td>
+        </tr>
+    </table>
+    <br />
+    <br />
+    <br />
+</div>
+
+<div class="table-responsive">
+    <table style="width:100%">
+        <tr>
+            <td colspan="4" class="celltransparent w90 left">
+                @Localizer["uvod1o",
+                    organizationDisplayName,
+                    Model.decision.SessionNumber,
+                    Model.decision.DecisionDate]
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="5" class="celltransparent w90 left"><p>&nbsp;</p></td>
+        </tr>
+
+        <tr>
+            <td colspan="4" class="celltransparent w90 center">
+                <h3>@Localizer["ODLUKU"]</h3>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="4" class="celltransparent w90 left">
+                @Html.Raw(string.Format(
+                    Localizer["odbija"].Value,
+                    opcija.Value,
+                    organizationDisplayName
+                ))
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="5" class="celltransparent w90 left"><p>&nbsp;</p></td>
+        </tr>
+    </table>
+</div>
+
+@if (Model.main != null && Model.main.Any())
+{
+    <div class="table-responsive">
+        <table class="observers-table">
+            <tr>
+                <td class="obs-rb">RB</td>
+                <td class="obs-name">@Localizer["Posmatrač"]</td>
+                <td class="obs-type">@Localizer["Razlog"]</td>
+            </tr>
+
+            @{
+                var rb = 1;
+            }
+
+            @foreach (var item in Model.main)
+            {
+                <tr>
+                    <td class="obs-rb">@rb</td>
+                    <td class="obs-name">
+                        @(culture?.Name == "bs-Cyrl-BA"
+                            ? Observers.Helpers.Converter.ConvertToCyrillic(item.FirstName + " " + item.LastName)
+                            : item.FirstName + " " + item.LastName)
+                    </td>
+                    <td class="obs-type">
+                        @item.ReasonName
+                    </td>
+                </tr>
+
+                rb++;
+            }
+        </table>
+    </div>
+}
+
+<div class="table-responsive">
+    <table style="width:100%">
+        <tr>
+            <td colspan="5" class="celltransparent w90 left"><p>&nbsp;</p></td>
+        </tr>
+
+        <tr>
+            <td colspan="5" class="celltransparent w90 center">
+                <p><b>@Localizer["Obrazloženje"]</b></p>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="5" class="celltransparent w90 left"><p>&nbsp;</p></td>
+        </tr>
+
+        <tr class="avoid">
+            <td colspan="5" class="celltransparent w90 left">
+                <p>
+                    @organizationDisplayName
+                    @Localizer["obrazlozenjeo1", Model.DateSend?.ToString("dd.MM.yyyy")]
+                </p>
+            </td>
+        </tr>
+
+        <tr class="avoid">
+            <td colspan="5" class="celltransparent w90 left">
+                <p>
+                    @Localizer["obrazlozenjeo2"]
+                </p>
+            </td>
+        </tr>
+
+        <tr class="avoid">
+            <td colspan="5" class="celltransparent w90 left">
+                <p>
+                    <b>@Localizer["PRAVNA POUKA"]:</b>
+                    @Localizer["zalba"].
+                    @Localizer["dostava"].
+                </p>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="5" class="celltransparent w90 left"><p>&nbsp;</p></td>
+        </tr>
+
+        <tr>
+            <td colspan="5" class="celltransparent w90 left">
+                <p>
+                    @Localizer["Broj"]
+                    @Model.decision.DecisionNumber
+                </p>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="5" class="celltransparent w90 left">
+                <p>
+                    @Localizer["Sarajevo"], @Model.decision.DecisionDate
+                </p>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="5" class="celltransparent w90 left"><p>&nbsp;</p></td>
+        </tr>
+
+        <tr class="avoid">
+            <td colspan="4">
+                <table style="width:100%">
+                    <tr>
+                        <td colspan="2" class="celltransparent w60 left">
+                            @Localizer["Dostavljeno"]:
+                        </td>
+                        <td colspan="2" class="celltransparent w40 left">
+                            @Localizer["Predsjednik"]<br/>
+                            @Localizer["Jovan Kalaba"]
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2" class="celltransparent w60 left">
+                            - @organizationDisplayName
+                        </td>
+                        <td colspan="2" class="celltransparent w40 left">
+                            @Model.Sign
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="4" class="celltransparent w90 left">
+                            -a/a
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>

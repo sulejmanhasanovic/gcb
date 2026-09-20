@@ -1,0 +1,145 @@
+﻿@using Syncfusion.EJ2
+@Html.AntiForgeryToken()
+@using Microsoft.AspNetCore.Localization
+
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@{
+	ViewBag.Title = "ŠIFARNICI";
+}
+
+@{
+
+	List<object> commands = new List<object>();
+	commands.Add(new { type = "Edit", buttonOption = new { iconCss = "e-icons e-edit text-primary", cssClass = "e-flat text-primary" } });
+	commands.Add(new { type = "Delete", buttonOption = new { iconCss = "e-icons e-delete text-danger", cssClass = "e-flat text-danger" } });
+	commands.Add(new { type = "Save", buttonOption = new { iconCss = "e-icons e-update", cssClass = "e-flat" } });
+	commands.Add(new { type = "Cancel", buttonOption = new { iconCss = "e-icons e-cancel-icon", cssClass = "e-flat" } });
+
+	var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+
+}
+<script type="text/javascript">
+	var url = {
+		Update: '@Url.Action("Update", "Classification")',
+		Insert: '@Url.Action("Insert", "Classification")',
+		Delete: '@Url.Action("Remove", "Classification")'
+	}
+</script>
+<div class="page-header pb-2">
+	<h1 class="page-title text-primary-d2 text-150">
+		@Localizer["Uređivanje šifarnika"]
+		<small class=" page-info text-secondary-d2 text-nowrap hidden-xs hidden-sm" id="gr" style="visibility: hidden;"></small>
+		<small class=" page-info text-secondary-d2 text-nowraphidden-xs hidden-sm" id="tp" style="visibility: hidden;"></small>
+	</h1>
+</div>
+
+<div class="dropdown-divider brc-primary-l2"></div>
+
+
+<div class="col-md-12">
+	<div tabindex="0" class="e-card" id="basic_card">
+		<div class="e-card-header">
+
+			<div class="e-card-header-caption">
+				@*<div class="e-card-header-title">@Localizer["Uređivanje šifarnika"]</div>*@
+				<div class="e-card-sub-title">@Localizer[""]</div>
+			</div>
+		</div>
+		<div class="e-card-content">
+
+			<ejs-grid id="ClassificationGrid"
+					  toolbar="@(new List<string>() { "Add"})"
+					  allowPaging="true"
+					  locale="@requestCulture.RequestCulture.UICulture.Name"
+					  actionComplete="actionComplete"
+					  dataSource="@ViewBag.data">
+
+
+				<e-grid-editSettings allowAdding="true"
+									 allowDeleting="true"
+									 allowEditing="true"
+									 mode="Normal"
+									 showConfirmDialog="true"
+									 showDeleteConfirmDialog="true">
+				</e-grid-editSettings>
+				<e-grid-pagesettings pageCount="20"></e-grid-pagesettings>
+
+				<e-grid-columns>
+					<e-grid-column field="Id" headerText="@Localizer["ID"].Value" isPrimaryKey="true" isIdentity="true" width="70"></e-grid-column>
+					<e-grid-column field="NameBs" headerText="@Localizer["Naslov bosanski"].Value" validationRules="@(new { required = true })" width="200"></e-grid-column>
+					<e-grid-column field="NameHr" headerText="@Localizer["Naslov hrvatski"].Value" validationRules="@(new { required = true })" width="200"></e-grid-column>
+					<e-grid-column field="NameSr" headerText="@Localizer["Naslov srpski"].Value" validationRules="@(new { required = true })" width="200"></e-grid-column>
+					<e-grid-column field="NameE" headerText="@Localizer["Naslov engleski"].Value" validationRules="@(new { required = true })" width="200"></e-grid-column>
+					<e-grid-column headerText="" width="100" commands="commands"></e-grid-column>
+				</e-grid-columns>
+
+			</ejs-grid>
+		</div>
+
+	</div>
+</div>
+
+<script type="text/javascript">
+
+
+	function actionComplete(args) {
+		console.log('args ' , args)
+		 if (args.requestType === "save" && args.action=="edit") {
+		 $.ajax({
+					url: url.Update,
+					type: 'POST',
+					data:{
+						value: args.data,
+						action: 'update'
+					},
+			})
+				.done(function (result) {
+			  var grid = document.getElementById("ClassificationGrid").ej2_instances[0];
+					 grid.refresh();
+					 if(result.response=="Success")
+						 showMessage("Snimanje podataka","Podaci su uspješno snimljeni", 'success');
+					 if(result.response=="Error")
+						 showMessage("Snimanje podataka","Greška prilikom snimanja podataka", 'danger');
+
+				});
+		 }
+
+		 if (args.requestType === "save" && args.action=="add") {
+		 $.ajax({
+					url: url.Insert,
+					type: 'POST',
+					data:{
+						value: args.data,
+						action: 'insert'
+					},
+			})
+				.done(function (result) {
+			  var grid = document.getElementById("ClassificationGrid").ej2_instances[0];
+					 grid.refresh();
+					 if(result.response=="Success")
+						 showMessage("Snimanje podataka","Podaci su uspješno snimljeni", 'success');
+					 if(result.response=="Error")
+						 showMessage("Snimanje podataka","Greška prilikom snimanja podataka", 'danger');
+				});
+		 }
+
+		 if (args.requestType === "delete") {
+		 $.ajax({
+					url: url.Delete,
+					type: 'POST',
+					data:{
+						key: args.data[0].Id,
+						action: 'delete'
+					},
+			})
+				.done(function (result) {
+			  var grid = document.getElementById("ClassificationGrid").ej2_instances[0];
+					 grid.refresh();
+					 if(result.response=="Success")
+						 showMessage("Snimanje podataka","Podaci su uspješno izbrisani", 'success');
+					 if(result.response=="Error")
+						 showMessage("Snimanje podataka","Greška prilikom brisanja podataka", 'danger');
+				});
+		 }
+	}
+</script>

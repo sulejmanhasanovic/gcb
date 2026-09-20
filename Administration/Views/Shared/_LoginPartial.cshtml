@@ -1,0 +1,73 @@
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@inject IViewLocalizer Localizer
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="top-user-menu">
+
+        <button type="button"
+                class="top-user-toggle"
+                id="topUserToggle">
+
+            <img class="top-user-image"
+                 src="~/images/user.png"
+                 alt="User" />
+
+            <span class="top-user-name">
+                @UserManager.GetUserName(User)
+            </span>
+
+            <i class="fa fa-angle-down top-user-arrow"></i>
+
+        </button>
+
+
+        <div class="top-user-dropdown"
+             id="topUserDropdown">
+
+
+            <a class="top-user-item"
+               asp-area="Identity"
+               asp-page="/Account/Manage/ChangePassword">
+
+                <i class="fa fa-cog text-warning"></i>
+
+                <span>
+                    @Localizer["Podešavanja"]
+                </span>
+
+            </a>
+
+
+            <div class="top-user-divider"></div>
+
+
+            <form asp-area="Identity"
+                  asp-page="/Account/Logout"
+                  asp-route-returnUrl="@Url.Action("Logout", "Dashboard", new { area = "" })"
+                  method="post"
+                  id="logoutForm">
+
+                <button class="top-user-item top-user-logout"
+                        type="submit">
+
+                    <i class="fa fa-power-off text-danger"></i>
+
+                    <span>
+                        @Localizer["Odjava"]
+                    </span>
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+}

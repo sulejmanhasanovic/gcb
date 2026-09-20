@@ -1,0 +1,224 @@
+﻿@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"]</title>
+
+	<link rel="stylesheet" href="~/css/ej2/material.css" />
+
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/preloader.css" asp-append-version="true" />
+
+	<link rel="stylesheet" href="~/lib/font-awesome/css/fontawesome.min.css" />
+	<link rel="stylesheet" href="~/lib/font-awesome/css/regular.min.css" />
+	<link rel="stylesheet" href="~/lib/font-awesome/css/solid.min.css" />
+	<link rel="stylesheet" href="~/lib/font-awesome/css/brands.min.css" />
+
+	<link rel="stylesheet" href="~/lib/ace/bootstrap.css" />
+
+
+	<!-- include fonts -->
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600&display=swap">
+
+	<link rel="stylesheet" href="~/lib/ace/smart_wizard.min.css" />
+	<link rel="stylesheet" href="~/lib/ace/smart_wizard_theme_circles.min.css" />
+	<link rel="stylesheet" href="~/lib/ace/ace.min.css" />
+
+
+	<script src="~/js/jquery.globalize.min.js"></script>
+	<script src="~/js/ej2/ej2.min.js"></script>
+
+	<script src="~/js/globalize.culture.bs-Latn-BA.min.js"></script>
+	<script src="~/js/globalize.culture.hr-BA.min.js"></script>
+	<script src="~/js/globalize.culture.bs-Cyrl-BA.min.js"></script>
+	<script src="~/js/globalize.culture.bs-Cyrl-BA.min.js"></script>
+
+</head>
+<body>
+
+	<div class="body-container">
+		<div id="preloader" style="display:none">
+			<div></div>
+		</div>
+
+		<nav class="navbar navbar-expand-lg navbar-fixed navbar-blue">
+			<div class="navbar-inner">
+
+				<div class="navbar-intro justify-content-xl-between">
+
+					<button type="button" class="btn btn-burger burger-arrowed static collapsed ml-2 d-flex d-xl-none" data-toggle-mobile="sidebar" data-target="#sidebar" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle sidebar">
+						<span class="bars"></span>
+					</button><!-- mobile sidebar toggler button -->
+
+					<a class="navbar-brand text-white logout" href="/" style="margin-right:0px">
+					<i class="fa-regular fa-address-card"></i>
+					</a><!-- /.navbar-brand -->
+
+					<a class="navbar-brand text-white d-none d-lg-block logout" href="/"  style="line-height:20px; margin-left:-6px">
+						<span>
+							<small style="font-size:20px;">
+								@localizer["e-Posmatrači"]
+							</small>
+
+
+						</span>
+					</a>
+
+
+					<button type="button" class="btn btn-burger mr-2 d-none d-xl-flex" data-toggle="sidebar" data-target="#sidebar" aria-controls="sidebar" aria-expanded="true" aria-label="Toggle sidebar">
+						<span class="bars"></span>
+					</button><!-- sidebar toggler button -->
+
+				</div><!-- /.navbar-intro -->
+
+
+				<div class="navbar-content">
+					<div class="pl-2">
+						@await Html.PartialAsync("_SelectLanguagePartial")
+					</div>
+				</div><!-- .navbar-content -->
+				@if (!User.Identity.IsAuthenticated)
+				{
+					<div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+						<ul class="navbar-nav ml-auto pr-2">
+							<li class="nav-item">
+								<a class="nav-link text-white" aria-current="page" href="/Identity/Account/Register">@localizer["Registracija"]</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link text-white" href="/Identity/Account/Login">@localizer["Prijava"]</a>
+							</li>
+						</ul>
+					</div>
+				}
+				<!-- mobile #navbarMenu toggler button -->
+				<button class="navbar-toggler ml-1 mr-2 px-1" type="button" data-toggle="collapse" data-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navbar menu">
+					<span class="pos-rel">
+						<img class="border-2 brc-white-tp1 radius-round" width="36" src="~/images/user.png" alt="User's Photo">
+						<span class="bgc-warning radius-round border-2 brc-white p-1 position-tr mr-n1px mt-n1px"></span>
+					</span>
+				</button>
+
+
+				<div class="navbar-menu collapse navbar-collapse navbar-backdrop" id="navbarMenu">
+
+					<div class="navbar-nav">
+						<ul class="nav">
+							@await Html.PartialAsync("_LoginPartial")
+
+
+						</ul>
+					</div>
+
+				</div>
+			</div>
+		</nav>
+
+		<div class="main-container bgc-white">
+			@if(User.Identity.IsAuthenticated && !User.IsInRole("PRP_Korisnik") && !User.IsInRole("OBS_Korisnik")){
+			<div id="sidebar" class="sidebar sidebar-fixed expandable sidebar-light sidebar-hover collapsed">
+				<div class="sidebar-inner">
+					<div class="container container-plus px-0 d-flex flex-column flex-xl-row">
+
+						<div class="ace-scroll flex-grow-1">
+							<!-- ace-scroll is not applied in desktop view, but it's used in mobile view -->
+
+
+							<ul class="nav has-active-border active-on-right">
+
+								<li class="nav-item">
+
+									<a href="/Admin/Statistic" class="nav-link">
+										<i class="nav-icon fa fa-home"></i>
+										<span class="nav-text fadeable">
+											<span>@localizer["Početna stranica"]</span>
+										</span>
+									</a>
+
+									<b class="sub-arrow"></b>
+
+								</li>
+
+								@await Html.PartialAsync("_MenuPartial")
+
+							</ul>
+						</div>
+
+					</div><!-- .container -->
+				</div><!-- .sidebar-inner -->
+			</div>
+			}
+			<div role="main" class="main-content">
+				<div class="page-content">
+					@RenderBody()
+
+				</div>
+
+				<footer class="footer">
+					<div class="footer-inner">
+						<div class="h-100 pt-3 border-t-1 brc-secondary-l2 bgc-white-tp1 shadow-md">
+							<span class="text-secondary-d2">&copy; @localizer["Copyright CIK BiH. Sva prava pridržana"]</span>
+
+							<span class="mx-3 action-buttons">
+								<a href="https://twitter.com/IZBORI_BA" target="_blank" class="text-blue-m2 text-140"><i class="fa-brands fa-twitter"></i></a>
+								<a href="https://www.instagram.com/izbori_ba/" target="_blank" class="text-blue-d2 text-140"><i class="fa-brands fa-instagram"></i></a>
+							</span>
+						</div>
+					</div><!-- .footer-inner -->
+				</footer>
+
+				<div class="footer-tools">
+					<a href="#" class="btn-scroll-up btn btn-green px-25 py-2 text-95 radius-1 mb-2 mr-2">
+						<i class="fa-solid fa-arrow-up w-2 h-2"></i>
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<ejs-toast id="element" title="Snimanje podataka" content="Podaci su uspješno snimljeni" cssClass="e-toast-success" icon=>
+			<e-toast-position X="Right" Y="Bottom"></e-toast-position>
+		</ejs-toast>
+	</div>
+
+	<script src="~/lib/ace/jquery.js"></script>
+	@if(User.Identity.IsAuthenticated && !User.IsInRole("OBS_Korisnik"))
+	{
+		<script src="~/js/menu.js"></script>
+	}
+	<script src="~/lib/ace/popper.js"></script>
+	<script src="~/lib/ace/bootstrap.js"></script>
+	<script src="~/lib/ace/ace.js"></script>
+
+
+	<ejs-scripts></ejs-scripts>
+	@await RenderSectionAsync("Scripts", required: false)
+	<script>
+		function showloader() {
+			$('#preloader').show();
+		}
+
+		function hideloader() {
+			$('#preloader').hide();
+		}
+
+		$( document ).ready(function() {
+			$('#menu > li').click(function (e) {
+				e.stopPropagation();
+				$('li').removeClass('active');
+				//$(selector).removeClass('open');
+				$(this).addClass('active');
+			});
+		});
+
+		function showMessage(title, text, type){
+			var toastObj = document.getElementById('element').ej2_instances[0];
+			toastObj.cssClass="e-toast-"+type;
+			toastObj.content = text;
+			toastObj.title=title;
+			toastObj.show();
+		}
+	</script>
+</body>
+</html>

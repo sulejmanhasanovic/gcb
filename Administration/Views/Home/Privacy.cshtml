@@ -1,0 +1,60 @@
+﻿@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@using Microsoft.AspNetCore.Localization
+@{
+    ViewData["Title"] = "CIK BiH";
+    ViewBag.showCookie=false;
+}
+<div class="container">
+    <div class="row-content">
+    <div class="col-md-12">
+        <section>
+        <h5>@Localizer["Postavke kolačića"]</h5>
+<b>@Localizer["Što su kolačići i za što ih koristimo?"]</b>
+<p>
+@Localizer["Kolačići (cookies) su male datoteke koje Vaš pretraživač pohranjuje na Vaše računar ili mobilni uređaj prilikom posjete našem Internet portalu. To omogućuje Internet portalu da prepozna Vaše računar kada nas sljedeći put posjetite, kako bi vam u skladu sa tim ponudili personalizirano iskustvo prilikom kretanja kroz njega. Kolačići na našem Internet portalu nisu usmjereni na špijuniranje korisnika i ne slijede sve što korisnik radi te nisu zlonamjerni kod ili virus. Također nisu povezani s neželjenim porukama (spamom), ne pohranjujeju korisničko ime i lozinku i nisu namijenjeni za oglašavanje. Informacije poput Vašeg imena ili adrese elektroničke pošte neće biti spremljene – Internet mjesto ne može pristupiti Vašim osobnim informacijama i datotekama na Vašem računaru."]
+@Localizer["Kolačići koje koristimo na ovoj stranici su tehnički kolačići, potrebni za funkcionisanje ovog Internet portala, ne možemo ih isključiti te za korištenje takve vrste kolačića ne trebamo vašu dozvolu. Svoj pretraživač možete postaviti da blokira te kolačiće ili pošalje upozorenje o njima, ali u tom slučaju neki dijelovi stranice neće raditi. Treba napomenuti da naše Internet portal funkcioniše optimalno samo ako je omogućeno korištenje kolačića."]
+</p>
+ 
+<b>@Localizer["Vrste kolačića"]</b>
+
+<p>@Localizer["Kolačići prema trajanju"]</p>
+
+<b>@Localizer["Stalni kolačići"]</b>
+<p>@Localizer["Stalni ili spremljeni kolačići ostaju na računaru nakon zatvaranja programa internet pretraživača. Pomoću njih Internet mjesta pohranjuju podatke, kao što su ime za prijavu i lozinka, postavke jezika ili postavke o kolačićima tako da ih ne morate ponovno unositi prilikom svakog idućeg pristupa. Stalni kolačići mogu ostati na računaru ili mobilnom uređaju danima, mjesecima, čak i godinama."]</p>
+
+<b>@Localizer["Privremeni kolačići"]</b>
+<p>@Localizer["Privremeni kolačići ili kolačići sesije uklanjaju se s računala po zatvaranju internet pretraživača. Pomoću njih Internet mjesta pohranjuju privremene podatke, poput npr. posljednjih nekoliko stranica koje ste otvorili na Internet portalu."]</p>
+
+<b>@Localizer["Kolačići prema izvoru"]</b>
+
+<p>@Localizer["Kolačići prve strane (first party cookie)"]
+@Localizer["Kolačići prve strane dolaze s Internet mjesta koje gledate, a mogu biti stalni ili privremeni. Pomoću tih kolačića Internet portal može pohraniti podatke koje će ponovo koristiti prilikom sljedećeg pristupa tom Internet portalu."]
+@Localizer["Kolačići treće strane (third party cookie)"]
+@Localizer["Kolačići treće strane dolaze s drugih Internet mjesta, a koje se nalaze na Internet portalu koje gledate. Pomoću tih kolačića druga Internet portala mogu pratiti korištenje Interneta na Internet portalu kog gledate."]
+</p>
+
+<b>@Localizer["Kolačići prema funkciji"]</b>
+<b>@Localizer["Tehnički kolačići – obavezni kolačići"]</b>
+<p>@Localizer["(uvijek aktivni) – potrebni za funkcionisanje Internet portala i ne mogu se isključiti u našim sustavima. Uobičajeno se postavljaju kao odgovor na vaše radnje koje uključuju zahtjev za uslugama, kao što su postavke kolačića, prijava ili ispunjavanje obrazaca. Svoj pretraživač možete postaviti da blokira te kolačiće ili pošalje upozorenje o njima, ali u tom slučaju neki dijelovi stranice neće raditi. Ti kolačići ne pohranjuju nikakve informacije koje bi vas mogle identificirati."]</p>
+
+<b>@Localizer["Funkcionalni kolačići"]</b>
+<p>@Localizer["(mogu se isključiti) – omogućuju Internet portalu pružanje poboljšane funkcionalnosti i personalizaciju."]  </p>
+
+<b>@Localizer["Statistički kolačići"]</b>
+<p>@Localizer["(mogu se isključiti)  – omogućuju bilježenje pristupa i izvora prometa u svrhu mjerenja i poboljšanja učinkovitosti  Internet mjesta"]</p>
+
+<b>@Localizer["Marketinški"]</b>
+<p>@Localizer["(mogu se isključiti) – služe za praćenje korisnika kroz web stranice i prikazivanje ciljanih oglasa. Ovo internet mjesto ne koristi marketinške kolačiće."] </p>
+
+<b>@Localizer["Kolačići koji se koriste na ovoj Internet stranici:"]</b>
+<p>@Localizer["Ovaj stranica koristi isključivo tehničke kolačiće."]</p>
+ 
+<p>@Localizer["Dodatno možete prihvatiti ili odbiti neke ili sve kolačiće prilagođavanjem postavki Vašeg pretraživača. Možete i izbrisati kolačiće koji su prethodno bili postavljeni u vaš pretraživač tako da odaberete opciju za brisanje istorije pregledavanja i pritom uključite i opciju brisanja kolačića."] </p>
+
+
+            </section>
+            </div>
+            </div>
+            </div>
+
+

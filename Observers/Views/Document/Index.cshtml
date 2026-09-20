@@ -1,0 +1,61 @@
+﻿@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = "PRP Administracija";
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+}
+@{
+    string[] items = new string[] { "NewFolder", "Upload", "Delete", "Download", "Rename", "SortBy", "Refresh", "Selection", "View", "Details" , "Open PDF"};
+    var defaultanimation = new Syncfusion.EJ2.Popups.DialogAnimationSettings { Effect = Syncfusion.EJ2.Popups.DialogEffect.FadeZoom };
+}
+
+<style>
+    .e-fe-tick::before {
+        content: '\e614';
+    }
+</style>
+
+<div class="page-header  pb-2">
+	<h1 class="page-title text-primary-d2 text-150">
+		@Localizer["Pregled fajlova"]
+		<small class=" page-info text-secondary-d2 text-nowrap hidden-xs hidden-sm" id="gr" style="visibility: hidden;"></small>
+		<small class=" page-info text-secondary-d2 text-nowraphidden-xs hidden-sm" id="tp" style="visibility: hidden;"></small>
+	</h1>
+</div>
+
+@if (User.IsInRole("PRP_Admin"))
+{
+    <input type="hidden" id="path" value= "@ViewBag.path" />
+	<div class="row" id="target">
+		<div class="col-md-12 p-3">
+            <div class=" control-section">
+        <div class="sample-container">
+        <ejs-filemanager id="file" created="created" view="Details" height="750" toolbarClick="toolbarClick" toolbarCreate="onCreate">
+            <e-filemanager-ajaxsettings url="/Document/FileOperations"
+                                        downloadUrl="/Document/Download"
+                                        uploadUrl="/Document/Upload"
+                                        getImageUrl="/Document/GetImage">
+            </e-filemanager-ajaxsettings>
+
+            <e-filemanager-contextmenusettings visible="true"></e-filemanager-contextmenusettings>
+            <e-filemanager-navigationpanesettings visible="true"></e-filemanager-navigationpanesettings>
+            <e-filemanager-toolbarsettings items="items"></e-filemanager-toolbarsettings>
+        </ejs-filemanager>
+		</div>
+        </div>
+		</div>
+</div>
+
+    <ejs-dialog id="fileDialog" animationSettings="defaultanimation" width="50%" cssClass="dialogfiles" target="#target" visible="false" 
+                     showCloseIcon="true" header="CIK BiH">
+            <e-content-template>
+              <ejs-pdfviewer id="container" height="100%"></ejs-pdfviewer>  
+            </e-content-template>
+        </ejs-dialog>
+
+}
+
+<script src="~/js/document.js"></script>
+   

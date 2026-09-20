@@ -1,0 +1,544 @@
+﻿@model Observers.Models.Pdf
+
+@{
+	Layout = "";
+}
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Localization
+@inject IViewLocalizer Localizer
+
+@{
+	var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+}
+
+<style type="text/css">
+	html * {
+		color: #000 !important;
+		font-family: Calibri !important;
+	}
+
+	.cellgray {
+		background-color: #e6e6e6;
+		border: 1px solid #333;
+		padding-left: 5px;
+		padding-right: 5px;
+	}
+
+	.cellwhite {
+		border: 1px solid #333;
+		padding-left: 5px;
+		padding-right: 5px;
+	}
+
+	.w10 {
+		width: 10%
+	}
+
+	.w15 {
+		width: 15%
+	}
+
+	.w20 {
+		width: 20%;
+	}
+
+	.w25 {
+		width: 25%;
+	}
+
+	.w30 {
+		width: 30%;
+	}
+
+	.w33 {
+		width: 33%;
+	}
+
+	.w34 {
+		width: 34%;
+	}
+
+	.w35 {
+		width: 35%;
+	}
+
+	.w40 {
+		width: 35%;
+	}
+
+	.w45 {
+		width: 35%;
+	}
+
+	.w50 {
+		width: 35%;
+	}
+
+	.w20px{
+		width:20px;
+	}
+
+	.center {
+		text-align: center;
+	}
+
+	.right {
+		text-align: right;
+	}
+
+	.pagebreak {
+		page-break-after: always
+	}
+
+	.bold {
+		font-weight: bold;
+	}
+
+	div.logo {
+		background-image: url("~/images/grb.png");
+		height: 53px;
+		width: 185px;
+	}
+
+</style>
+
+<table style="width:100%;">
+	<tr>
+		<td style="text-align:right">
+			BOSNA I HERCEGOVINA
+			<br />
+			CENTRALNA IZBORNA KOMISIJA
+			<br />
+			SREDIŠNJE IZBORNO POVJERENSTVO
+		</td>
+		<td style="width:100px; text-align:center"><img src="@(Model.path)" /></td>
+		<td>
+			БОСНА И ХЕРЦЕГОВИНА
+			<br />
+			ЦЕНТРАЛНА ИЗБОРНА КОМИСИЈА
+		</td>
+		<td style="width: 100px ">
+			<div id="qrCode"></div>
+			<div id="brProtocol" style="font-size:12px">@Model.main.Id</div>
+		</td>
+	</tr>
+</table>
+<br/>
+<div style="width:100%; text-align:center"><h3>@Localizer["ZAHTJEV"+@Model.main.AccreditationTypeId.ToString()]</h3></div>
+<div style="width:100%; text-align:center">@Localizer["za posmatranje izbornih aktivnosti Centralne izborne komisije BiH, Glavnog centra za brojanje i rada u diplomatsko-konzularnim predstavništvima"]</div>
+<br />
+<div class="table-responsive">
+	<table style="width:100%">
+		<tr>
+			<td class="center cellwhite w20px">1. </td>
+			<td class="cellgray w40">@Localizer["Naziv"+@Model.main.AccreditationTypeId.ToString()]</td>
+			<td class="cellwhite">@Model.main.Name</td>
+		</tr>
+		<tr>
+			<td class="center cellwhite">2. </td>
+			<td class="cellgray">@Localizer["Kontakt-adresa"]</td>
+			<td class="cellwhite">@Model.main.Address</td>
+		</tr>
+		<tr>
+			<td class="center cellwhite">3. </td>
+			<td class="cellgray">@Localizer["Broj telefona / faksa, uključujući i pozivni broj"]</td>
+			<td class="cellwhite">@Model.main.Telephone</td>
+		</tr>
+		<tr>
+			<td class="center cellwhite">4. </td>
+			<td class="cellgray w20">@Localizer["Email"]</td>
+			<td class="cellwhite">@Model.main.Email</td>
+		</tr>
+		<tr>
+			<td class="center cellwhite">5. </td>
+			<td class="cellgray w20">@Localizer["Jezik za štampu akreditacija"]</td>
+			<td class="cellwhite">@Model.main.Language</td>
+		</tr>
+	</table>
+</div>
+
+<br/>
+<div class="table-responsive">
+	<table style="width:100%">
+		<tr>
+			<td class="center cellgray"></td>
+			<td class="cellgray bold" colspan="2">@Localizer["Prijava za posmatranje"]</td>
+		</tr>
+		<tr>
+			<td class="center cellwhite w20px">@Localizer["A"]) </td>
+			<td class="cellgray w40">@Localizer["Rada Centralne izborne komisije BiH"]</td>
+			<td class="cellwhite">@(Model.main.CIK==true ? @Localizer["DA"] : "") </td>
+		</tr>
+		<tr>
+			<td class="center cellwhite">@Localizer["B"]) </td>
+			<td class="cellgray">@Localizer["Rada izborne komisije"]</td>
+			<td class="cellwhite">@(Model.main.OIK==true ? @Localizer["DA"] : "")</td>
+		</tr>
+		<tr>
+			<td class="center cellwhite">@Localizer["C"]) </td>
+			<td class="cellgray">@Localizer["Rada centra za birački spisak"]</td>
+			<td class="cellwhite">@(Model.main.CBS==true ? @Localizer["DA"] : "")</td>
+		</tr>
+		<tr>
+			<td class="center cellwhite">@Localizer["D"]) </td>
+			<td class="cellgray">@Localizer["Rada na biračkom mjestu"]</td>
+			<td class="cellwhite">@(Model.main.BM==true ? @Localizer["DA"] : "")</td>
+		</tr>
+		<tr>
+			<td class="center cellwhite">@Localizer["E"]) </td>
+			<td class="cellgray">@Localizer["Rada Glavnog centra za brojanje"]</td>
+			<td class="cellwhite">@(Model.main.GCB==true ? @Localizer["DA"] : "")</td>
+		</tr>
+		<tr>
+			<td class="center cellwhite">@Localizer["F"]) </td>
+			<td class="cellgray">@Localizer["Rada u diplomatsko-konzularnim predstavništvima"]</td>
+			<td class="cellwhite">@(Model.main.DKP==true ? @Localizer["DA"] : "")</td>
+		</tr>
+	</table>
+</div>
+<br/>
+<br />
+<div class="table-responsive">
+	<table style="width:100%">
+		<tr>
+			<td class="cellwhite">@Model.main.Reason</td>
+		</tr>
+	</table>
+</div>
+<br />
+<br />
+<b>@Localizer["Svojim potpisom"+@Model.main.AccreditationTypeId.ToString()]</b>
+<br/>
+<br/>
+<div class="table-responsive">
+	<table style="width:100%">
+		<tr>
+			<td class="center cellwhite w35">
+
+				<br/>
+				<br/>
+				@Localizer["Potpis"+@Model.main.AccreditationTypeId.ToString()]
+			</td>
+			<td class="cellwhite w30">
+				<br/>
+				<br/>
+				@if(@Model.main.AccreditationTypeId==1)
+				@Localizer["Potpis"]
+			</td>
+			<td class="center cellwhite w35">
+				<br/>
+				<br/>
+				@Localizer["Datum"]
+			</td>
+		</tr>
+	</table>
+</div>
+<br/>
+<br/>
+<div style="width:100%; background-color:#f2f2f2; border:1px solid #ccc; padding:10px">
+	@Localizer["Napomena11"]
+	<br/>
+	@Localizer["Napomena12"]
+	<br/>
+	@Localizer["Napomena13"]
+</div>
+
+
+@*<div class="pagebreak"></div>
+
+	@if (@Model.main.Cik == true)
+{
+	<table style="width:100%;">
+		<tr>
+			<td style="text-align:right">
+				BOSNA I HERCEGOVINA
+				<br />
+				CENTRALNA IZBORNA KOMISIJA
+				<br />
+				SREDIŠNJE IZBORNO POVJERENSTVO
+			</td>
+			<td style="width:100px; text-align:center"><img src="@(Model.path)" /></td>
+			<td>
+				БОСНА И ХЕРЦЕГОВИНА
+				<br />
+				ЦЕНТРАЛНА ИЗБОРНА КОМИСИЈА
+			</td>
+		</tr>
+	</table>
+	<br/>
+	<div style="width:100%; text-align:center"><h3>@Localizer["LISTA PREDLOŽENIH"+@Model.main.AccreditationTypeId.ToString()]</h3></div>
+	<div style="width:100%; text-align:center">@Localizer["za posmatranje rada Centralne izborne komisije BiH"]</div>
+	<br/>
+	<div class="width:100%; text-align:center; border-bottom:1px solid #ccc"><b>@Model.main.Name</b></div>
+	<br/>
+	<br/>
+	<div class="table-responsive">
+		<table style="width:100%">
+			<tr>
+				<td class="center cellgray w20px">
+					@Localizer["Redni broj"]
+				</td>
+				<td class="cellgray">
+					@Localizer["Prezime"]
+				</td>
+				<td class="cellgray">
+					@Localizer["Ime"]
+				</td>
+				<td class="cellgray">
+					@Localizer["Broj važeće LK"]
+				</td>
+				<td class="cellgray">
+					@Localizer["JMB"]
+				</td>
+			</tr>
+			@{
+				var i = 1;
+			}
+			@foreach (var item in @Model.observers)
+			{
+				if(item.Cik==true){
+				<tr>
+					<td class="center cellwhite w20px">
+						@i
+					</td>
+					<td class="cellwhite">
+						@item.LastName
+					</td>
+					<td class="cellwhite">
+						@item.FirstName
+					</td>
+					<td class="cellwhite">
+						@item.IdentityId
+					</td>
+					<td class="cellwhite">
+						@item.Jmbg
+					</td>
+				</tr>
+				i = i + 1;
+				}
+			}
+		</table>
+	</div>
+	<div class="pagebreak"></div>
+}
+
+	@if (@Model.main.Gcb == true)
+{
+	<table style="width:100%;">
+		<tr>
+			<td style="text-align:right">
+				BOSNA I HERCEGOVINA
+				<br />
+				CENTRALNA IZBORNA KOMISIJA
+				<br />
+				SREDIŠNJE IZBORNO POVJERENSTVO
+			</td>
+			<td style="width:100px; text-align:center"><img src="@(Model.path)" /></td>
+			<td>
+				БОСНА И ХЕРЦЕГОВИНА
+				<br />
+				ЦЕНТРАЛНА ИЗБОРНА КОМИСИЈА
+			</td>
+		</tr>
+	</table>
+	<br/>
+	<div style="width:100%; text-align:center"><h3>@Localizer["LISTA PREDLOŽENIH"+@Model.main.AccreditationTypeId.ToString()]</h3></div>
+	<div style="width:100%; text-align:center">@Localizer["za posmatranje rada Glavnog centra za brojanje"]</div>
+	<br/>
+	<div class="width:100%; text-align:center; border-bottom:1px solid #ccc"><b>@Model.main.Name</b></div>
+	<br/>
+	<br/>
+	<div class="table-responsive">
+		<table style="width:100%">
+			<tr>
+				<td class="center cellgray w20px">
+					@Localizer["Redni broj"]
+				</td>
+				<td class="cellgray">
+					@Localizer["Prezime"]
+				</td>
+				<td class="cellgray">
+					@Localizer["Ime"]
+				</td>
+				<td class="cellgray">
+					@Localizer["Broj važeće LK"]
+				</td>
+				<td class="cellgray">
+					@Localizer["JMB"]
+				</td>
+			</tr>
+			@{
+				var i = 1;
+			}
+			@foreach (var item in @Model.observers)
+			{
+				if(item.Gcb==true){
+				<tr>
+					<td class="center cellwhite w20px">
+						@i
+					</td>
+					<td class="cellwhite">
+						@item.LastName
+					</td>
+					<td class="cellwhite">
+						@item.FirstName
+					</td>
+					<td class="cellwhite">
+						@item.IdentityId
+					</td>
+					<td class="cellwhite">
+						@item.Jmbg
+					</td>
+				</tr>
+				i = i + 1;
+				}
+			}
+		</table>
+	</div>
+	<div class="pagebreak"></div>
+}
+
+
+	@if (@Model.main.Dkp == true)
+{
+	<table style="width:100%;">
+		<tr>
+			<td style="text-align:right">
+				BOSNA I HERCEGOVINA
+				<br />
+				CENTRALNA IZBORNA KOMISIJA
+				<br />
+				SREDIŠNJE IZBORNO POVJERENSTVO
+			</td>
+			<td style="width:100px; text-align:center"><img src="@(Model.path)" /></td>
+			<td>
+				БОСНА И ХЕРЦЕГОВИНА
+				<br />
+				ЦЕНТРАЛНА ИЗБОРНА КОМИСИЈА
+			</td>
+		</tr>
+	</table>
+	<br/>
+	<div style="width:100%; text-align:center"><h3>@Localizer["LISTA PREDLOŽENIH"+@Model.main.AccreditationTypeId.ToString()]</h3></div>
+	<div style="width:100%; text-align:center">@Localizer["za posmatranje rada na biračkom mjestu u diplomatsko-konzularnim predstavništvima"]</div>
+	<br/>
+	<div class="width:100%; text-align:center; border-bottom:1px solid #ccc"><b>@Model.main.Name</b></div>
+	<br/>
+	<br/>
+	<div class="table-responsive">
+		<table style="width:100%">
+			<tr>
+				<td class="center cellgray w20px">
+					@Localizer["Redni broj"]
+				</td>
+				<td class="cellgray">
+					@Localizer["Prezime"]
+				</td>
+				<td class="cellgray">
+					@Localizer["Ime"]
+				</td>
+				<td class="cellgray">
+					@Localizer["Broj važeće LK"]
+				</td>
+				<td class="cellgray">
+					@Localizer["JMB"]
+				</td>
+			</tr>
+			@{
+				var i = 1;
+			}
+			@foreach (var item in @Model.observers)
+			{
+				if(item.Dkp==true){
+				<tr>
+					<td class="center cellwhite w20px">
+						@i
+					</td>
+					<td class="cellwhite">
+						@item.LastName
+					</td>
+					<td class="cellwhite">
+						@item.FirstName
+					</td>
+					<td class="cellwhite">
+						@item.IdentityId
+					</td>
+					<td class="cellwhite">
+						@item.Jmbg
+					</td>
+				</tr>
+				i = i + 1;
+				}
+			}
+		</table>
+	</div>
+	<div class="pagebreak"></div>
+}
+
+
+<table style="width:100%;">
+	<tr>
+		<td style="text-align:right">
+			BOSNA I HERCEGOVINA
+			<br />
+			CENTRALNA IZBORNA KOMISIJA
+			<br />
+			SREDIŠNJE IZBORNO POVJERENSTVO
+		</td>
+		<td style="width:100px; text-align:center"><img src="@(Model.path)" /></td>
+		<td>
+			БОСНА И ХЕРЦЕГОВИНА
+			<br />
+			ЦЕНТРАЛНА ИЗБОРНА КОМИСИЈА
+		</td>
+	</tr>
+</table>
+<br/>
+<div style="width:100%; text-align:center"><h3>@Localizer["PRAVILA PONAŠANJA I IZJAVA O POŠTIVANJU TAJNOSTI GLASANJA"]</h3></div>
+<br />
+<div style="width:100%; text-align:center">
+	@Localizer["akreditiranog posmatrača za posmatranje rada Centralne izborne komisije BiH, izborne komisije, centra za birački spisak, biračkog mjesta, Glavnog centra za brojanje i drugih izbornih mjesta"]
+</div>
+<br/>
+<br/>
+<div class="width:100%; text-align:center; border-bottom:1px solid #ccc"><b></b></div>
+<div class="width:100%; text-align:center">@Localizer["Ime akreditiranog posmatrača"]</div>
+<br/>
+<br/>
+<div class="width:100%; text-align:center; border-bottom:1px solid #ccc"><b>@Model.main.Name</b></div>
+<div class="width:100%; text-align:center">@Localizer["Naziv"+@Model.main.AccreditationTypeId.ToString()]</div>
+<br/>
+<br/>
+
+<div style="width:99%;border:1px solid #ccc; padding:20px">
+	<div style="width:100%; text-align:center">@Localizer["PRAVILA PONAŠANJA"]</div>
+	<br/>
+	@Localizer["Ja"], ____________________________________________________________________, @Localizer["kao akreditirani posmatrač, ovim izjavljujem:"]
+	<br/><br/>
+	@Localizer["A) da ću biti nepristran u skladu s mojim dužnostima;"]
+	<br/><br/>
+	@Localizer["B) da se neću miješati u izborni proces koji uključuje upis birača u Centralni birački spisak, proceduru na dan glasanja ili brojanja glasova i da ću poštivati tajnost glasanja;"]
+	<br/><br/>
+	@Localizer["C) da neću pokušati vršiti bilo kakav uticaj na lice u vezi s njegovim izborom biračkih opcija ili načina na koji će označiti glasački listić;"]
+	<br/><br/>
+	@Localizer["D) da ću poštivati odredbe Izbornog zakona BiH."]
+	<br/><br/>
+	@Localizer["E) Posmatrač može stavljati obrazložene primjedbe na rad organa nadležnih za provođenje izbora utvrđenih Izbornim zakonom BiH u pisanoj formi koje se prilažu u zapisnik o radu organa nadležnog za provođenje izbora, na osnovu čega politički subjekt može uložiti prigovor nadležnom organu"]
+	<br/>
+	<br/>
+	<br/>
+	@Localizer["Potpis akreditiranog posmatrača:"]
+	<br/>
+	<br/>
+	<br/>
+	@Localizer["Datum:"]
+</div>*@
+<script type="text/javascript" src="@Model.pathjs"></script>
+<script type="text/javascript">
+	new QRCode(document.getElementById("qrCode"),
+		{
+			text: "@Html.Raw(Model.main.Id)",
+			width: 70,
+			height: 70
+		});
+</script>

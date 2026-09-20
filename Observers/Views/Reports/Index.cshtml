@@ -1,0 +1,113 @@
+﻿@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+	var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+	ViewData["Title"] = "Izvještaji";
+}
+
+
+<div class="page-header pb-2">
+	<h1 class="page-title text-primary-d2 text-150">
+		@Localizer["Izvještaji"]
+		<small class=" page-info text-secondary-d2 text-nowrap hidden-xs hidden-sm" id="gr" style="visibility: hidden;"></small>
+		<small class=" page-info text-secondary-d2 text-nowraphidden-xs hidden-sm" id="tp" style="visibility: hidden;"></small>
+	</h1>
+</div>
+
+
+			<div class="tab-content bgc-white p-35 border-1 brc-grey-l1">
+				<div class="tab-pane fade show active text-95" id="rptByCand" role="tabpanel" aria-labelledby="home5-tab-btn">
+					<div class="col-lg-12 control-section">
+						<ejs-grid id="gridData" allowFiltering="true"
+								  rowHeight="40"
+								  width="100%"
+								  allowResizing="true"
+								  allowGrouping="true"
+								  locale="en-US"
+								  dataSource="@ViewBag.ReportData"
+								  allowTextWrap="true" allowExcelExport="true" allowSorting="true"
+								  toolbarClick="toolbarClick"
+								  toolbar="@(new List<string>() { "ExcelExport", "Search" })"
+								  allowPaging="true" locale="@requestCulture.RequestCulture.UICulture.Name">
+
+							<e-grid-pagesettings pageCount="10" pageSize="17"></e-grid-pagesettings>
+							<e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+							<e-grid-selectionsettings type="Single"></e-grid-selectionsettings>
+							<e-grid-selectionsettings mode="Row"></e-grid-selectionsettings>
+
+
+
+							<e-grid-columns>
+								<e-grid-column field="NameLatin" headerText="@Localizer["Vrsta"].Value" width="150px"></e-grid-column>
+					<e-grid-column field="Name" headerText="@Localizer["Naziv"].Value"></e-grid-column>
+					<e-grid-column field="Approved" headerText="@Localizer["Odobrena org."].Value" displayAsCheckBox="true"
+								   type="boolean" width="150px"></e-grid-column>
+					<e-grid-column field="JMBG" headerText="@Localizer["JMBG"].Value" width="150px"></e-grid-column>
+					<e-grid-column field="LastName" headerText="@Localizer["Prezime"].Value" width="150px"></e-grid-column>
+					<e-grid-column field="FirstName" headerText="@Localizer["Ime"].Value" width="150px"></e-grid-column>
+					<e-grid-column field="IdentityId" headerText="@Localizer["LK"].Value" width="120px"></e-grid-column>
+					<e-grid-column field="Passport" headerText="@Localizer["Pasoš"].Value" width="130px"></e-grid-column>
+					<e-grid-column field="CountryName" headerText="@Localizer["Država"].Value" width="140px"></e-grid-column>
+					<e-grid-column field="ObsCIK" headerText="@Localizer["CIK"].Value" displayAsCheckBox="true"
+								   type="boolean" width="120px"></e-grid-column>
+@* 					<e-grid-column field="ObsOIK" headerText="@Localizer["OIK"].Value" displayAsCheckBox="true"
+								   type="boolean" width="120px"></e-grid-column>
+					<e-grid-column field="ObsCBS" headerText="@Localizer["CBS"].Value" displayAsCheckBox="true"
+								   type="boolean" width="120px"></e-grid-column> *@
+					<e-grid-column field="ObsBM" headerText="@Localizer["BM"].Value" displayAsCheckBox="true"
+								   type="boolean" width="120px"></e-grid-column>
+					<e-grid-column field="MuniName" headerText="@Localizer["Opština"].Value"></e-grid-column>
+@* 					<e-grid-column field="ObsGCB" headerText="@Localizer["GCB"].Value" displayAsCheckBox="true"
+								   type="boolean" width="120px"></e-grid-column> *@
+					<e-grid-column field="ObsDKP" headerText="@Localizer["DKP"].Value" displayAsCheckBox="true"
+								   type="boolean" width="120px"></e-grid-column>
+					<e-grid-column field="ObsApproved" headerText="@Localizer["Odobren posm."].Value" displayAsCheckBox="true"
+								   type="boolean" width="150px"></e-grid-column>
+
+							</e-grid-columns>
+						</ejs-grid>
+					</div>
+
+				</div>
+			</div>
+
+<script>
+
+	ej.base.L10n.load({
+		'en-US': {
+			'grid': {
+				'Item': 'Broj zahtjeva',
+				'Items': 'Broj zahtjeva',
+				'Drag a column header here to group its column': 'Prevucite kolonu ovdje za grupisanje',
+				'Update': 'Save',
+				'Delete': 'Remove',
+			}
+		}
+	});
+
+	function toolbarClick(args) {
+
+		if (args.item.id === 'gridData_pdfexport') {
+			var gridObj = document.getElementById("gridData").ej2_instances[0];
+			let pdfExportProperties = {
+				theme: {
+					header: {
+						font: new ej.pdfexport.PdfStandardFont(ej.pdfexport.PdfFontFamily.TimesRoman, 11),
+						caption: { font: new ej.pdfexport.PdfStandardFont(ej.pdfexport.PdfFontFamily.TimesRoman, 9) },
+						record: { font: new ej.pdfexport.PdfStandardFont(ej.pdfexport.PdfFontFamily.TimesRoman, 10) }
+					}
+				}
+			};
+			gridObj.pdfExport(pdfExportProperties);
+		}
+		if (args.item.id === 'gridData_excelexport') {
+			var gridObj = document.getElementById("gridData").ej2_instances[0];
+			gridObj.excelExport();
+		}
+		if (args.item.id === 'gridData_csvexport') {
+			var gridObj = document.getElementById("gridData").ej2_instances[0];
+			gridObj.csvExport();
+		}
+	}
+</script>

@@ -1,0 +1,23 @@
+﻿@model IEnumerable<Observers.Models.Data_AODocument>
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Localization
+@inject IViewLocalizer Localizer
+@using Microsoft.AspNetCore.Http
+@using Observers.Models
+
+
+      
+@foreach (Data_AODocument file in @Model)
+        {
+        <div class="row p-2">  
+                <div class="col-sm-8 pl-3">
+                   <img src="@string.Format("/images/{0}.png",@file.DocumentName.Substring(@file.DocumentName.LastIndexOf('.') + 1))" /><a onclick="load2('@file.DocumentPath', @file.DocumentType)" class="text-primary doc" style="cursor:pointer">@file.DocumentName (@file.DocumentSize)</a></div>
+                    <div class="col-sm-4">@file.DateInserted
+         
+                   @*  @if(User.IsInRole("CAND_Korisnik") || User.IsInRole("OBS_Korisnik")){
+                        <button class="btn btn-outline-light btn-h-light-danger btn-a-light-danger border-b-2 text-600 px-3 mb-1" onclick="deleteFile(@file.Id, @file.DocumentType)"><i class="fa fa-trash-alt text-110 text-danger-d2 mr-1"></i></button>
+                    } *@
+                
+                </div>
+        </div>
+        }

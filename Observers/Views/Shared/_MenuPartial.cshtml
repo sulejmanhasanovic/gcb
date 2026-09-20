@@ -1,0 +1,100 @@
+@using Microsoft.AspNetCore.Identity
+@using System.Threading.Tasks
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Options
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IViewLocalizer Localizer
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+<ul class="nav nav-list" id="menu"></ul>
+
+
+<script>
+
+	  function getmenu() {
+		$.ajax({
+			url: '@Url.Action("GetMenu", "Dashboard")',
+			type: 'POST',
+			data: {},
+			cache: false,
+			dataType: "json"
+		}).done(function (result) {
+			var groups = result["groups"];
+			var pages = result["pages"];
+			var html="";
+
+			for (var group in groups)
+			{
+				if(pages.some(pages => pages.PageGroupId === groups[group]["Id"])){
+
+				html+= `
+				<li class="nav-item">
+					<a href="#" class="nav-link dropdown-toggle collapsed">`
+
+						if (groups[group]["Id"] == 1)
+						{
+							html+=`<i class="nav-icon fa fa-envelope fa-lg text-blue"></i>`
+						}
+						else if (groups[group]["Id"] == 2 || groups[group]["Id"] == 9 )
+						{
+							html+=`<i class="nav-icon fa fa-database fa-2x text-orange"></i>`
+						}
+						else if (groups[group]["Id"] == 3)
+						{
+							html+=`<i class="nav-icon fa fa-address-card text-purple"></i>`
+						}
+						else if (groups[group]["Id"] == 4)
+						{
+							html+=`<i class="nav-icon fa fa-user text-danger"></i>`
+						}
+						else if (groups[group]["Id"] == 5 || groups[group]["Id"] == 6)
+						{
+							html+=`<i class="nav-icon fa fa-table text-info"></i>`
+						}
+
+						html+=`
+
+						<span class="nav-text fadeable">
+							<span title='${groups[group]["DescBs"]}'>${groups[group]["GroupNameBs"]} </span>
+						</span>
+
+						<b class="caret fa fa-angle-left rt-n90"></b>
+
+					</a>
+
+
+					  <div class="hideable submenu collapse">
+					<ul class="submenu-inner">`
+
+
+					for (var item in pages)
+					{
+						if(pages[item]["PageGroupId"]==groups[group]["Id"])
+						{
+							html+=`
+							<li class="nav-item">
+								<a href="/${pages[item]["Controller"]}/${pages[item]["Action"]}" class="nav-link">
+									<span class="nav-text">${pages[item]["PageNameBs"]}</span></span>
+								</a>
+
+
+							</li>`
+
+						}
+					}
+
+					html+=`</ul></div><b class="sub-arrow"></b></li>`;
+				}
+			}
+			var menu = document.getElementById('menu');
+			menu.innerHTML=html;
+
+		});
+	}
+
+</script>

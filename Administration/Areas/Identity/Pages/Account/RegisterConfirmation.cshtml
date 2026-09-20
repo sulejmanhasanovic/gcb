@@ -1,0 +1,32 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@model RegisterConfirmationModel
+@inject IViewLocalizer Localizer
+
+@{
+	ViewData["Title"] = @Localizer["Potvrda registracije"];
+
+}
+<div class="container">
+	<div class="row-content">
+		<div class="col-md-6 offset-md-3">
+			<section>
+				<h5 class="card-title">@Localizer["Registracija na portal e-Izbori je uspješno završena"]</h5>
+				<div class="row">
+					<div class="col-md-12">
+						<p>@Localizer["Centralna izborna komisija BiH vam je proslijedila e-mail za potvrdu registracije"].</p>
+
+						<p>@Localizer["Provjerite da li ste primili e-mail, uključujući i neželjenu poštu (Spam, Junk mail)"].</p>
+						
+						<p>@Localizer["Prijavu na portal, odnosno potvrdu registracije putem linka i pristupnih podataka koji su vam dostavljeni potrebno je da izvršite u roku od 15 minuta"].</p>
+
+						<p>@Localizer["Ukoliko ne potvrdite registraciju putem linka dostavljenog u e-mailu,  vaši prijavni podaci bit će izbrisani, te će vam biti omogućeno ponovno prijavljivanje"].</p>
+
+						<p>@Localizer["Ako niste primili e-mail za potvrdu registracije, provjerite tačnost e-mail adrese koju ste upisali ili kontaktirajte Centralnu izbornu komisiji BiH putem e-maila info@izbori.ba ili putem telefona na brojeve +387 33 251 331 i +387 33 251 332"].</p>
+					</div>
+				</div>
+			</section>
+		</div>
+	</div>
+</div>
+

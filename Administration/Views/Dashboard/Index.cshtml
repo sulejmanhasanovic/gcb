@@ -1,0 +1,751 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@using Newtonsoft.Json
+
+@{
+    ViewData["Title"] = "Identity Manager";
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+}
+
+<div class="dashboard-home">
+
+    <!-- LIJEVO - APLIKACIJE -->
+    <aside class="dashboard-app-panel">
+
+        <div class="dashboard-app-box">
+
+            <div class="dashboard-app-box-header">
+
+                <div>
+                    <div class="dashboard-panel-title">
+                        @Localizer["Aplikacije"]
+                    </div>
+
+                    <div class="dashboard-panel-subtitle">
+                        @Localizer["Odaberite aplikaciju za nastavak rada"]
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="dashboard-app-box-body">
+                <div id="applications" class="dashboard-app-list"></div>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- DESNO - STATISTIKE -->
+    <main class="dashboard-overview">
+
+        <div class="overview-header">
+            <div>
+                <h2>@Localizer["Pregled izbornog procesa"]</h2>
+                <span>@Localizer["Osnovni pokazatelji"]</span>
+            </div>
+        </div>
+
+
+        <div class="overview-groups-grid">
+
+            <!-- CENTRALNI BIRAČKI SPISAK -->
+            <section class="overview-box">
+
+                <div class="overview-box-header">
+
+                    <div class="overview-icon blue">
+                        <i class="fa fa-database"></i>
+                    </div>
+
+                    <span>
+                        @Localizer["Centralni birački spisak"]
+                    </span>
+
+                </div>
+
+                <div class="overview-box-body">
+
+                    <div class="overview-stats"
+                         id="voterStat">
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- POLITIČKI SUBJEKTI -->
+            <section class="overview-box">
+
+                <div class="overview-box-header">
+
+                    <div class="overview-icon turquoise">
+                        <i class="fa fa-newspaper"></i>
+                    </div>
+
+                    <span>
+                        @Localizer["Politički subjekti"]
+                    </span>
+
+                </div>
+
+                <div class="overview-box-body">
+
+                    <div class="overview-stats"
+                         id="psStat">
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- KANDIDATI -->
+            <section class="overview-box overview-box-full">
+
+                <div class="overview-box-header">
+
+                    <div class="overview-icon red">
+                        <i class="fa fa-users"></i>
+                    </div>
+
+                    <span>
+                        @Localizer["Kandidati"]
+                    </span>
+
+                </div>
+
+                <div class="overview-box-body">
+                    <!-- kandidat statistike -->
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+
+<style>
+
+    /* ==========================================================
+           GLAVNI RASPORED
+           ========================================================== */
+
+    .dashboard-home {
+        display: grid;
+        grid-template-columns: 365px minmax(0, 1fr);
+        gap: 28px;
+        width: 100%;
+        max-width: none;
+        align-items: start;
+    }
+
+    .dashboard-app-panel,
+    .dashboard-overview {
+        min-width: 0;
+    }
+
+
+    /* ==========================================================
+           LIJEVO - APLIKACIJE
+           ========================================================== */
+
+    .dashboard-app-box {
+        width: 100%;
+        background: #fff;
+        border: 1px solid #dce6ee;
+        border-radius: 10px;
+        box-shadow: 0 4px 18px rgba(35, 75, 105, .05);
+        overflow: hidden;
+    }
+
+    .dashboard-app-box-header {
+        min-height: 86px;
+        display: flex;
+        align-items: center;
+        padding: 20px 22px;
+        border-bottom: 1px solid #e5edf2;
+        background: #fff;
+        box-sizing: border-box;
+    }
+
+    .dashboard-panel-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #304d64;
+    }
+
+    .dashboard-panel-subtitle {
+        margin-top: 4px;
+        font-size: 12px;
+        color: #8296a7;
+    }
+
+    .dashboard-app-box-body {
+        padding: 16px;
+    }
+
+    .dashboard-app-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .dashboard-app-card {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        min-height: 104px;
+        padding: 17px 48px 17px 18px;
+        box-sizing: border-box;
+        background: #fff;
+        border: 1px solid #dce6ee;
+        border-left: 4px solid #1976bd;
+        border-radius: 8px;
+        text-decoration: none !important;
+        box-shadow: 0 3px 10px rgba(35, 75, 105, .045);
+        transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+
+        .dashboard-app-card:hover {
+            transform: translateX(2px);
+            border-color: #c5d7e4;
+            border-left-color: #126ba7;
+            box-shadow: 0 6px 16px rgba(35, 75, 105, .09);
+        }
+
+    .dashboard-app-icon {
+        width: 54px;
+        min-width: 54px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 17px;
+        border-radius: 10px;
+        background: #eaf4fb;
+        color: #1976bd;
+        font-size: 22px;
+    }
+
+    .dashboard-app-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .dashboard-app-title {
+        margin-bottom: 5px;
+        color: #176fae;
+        font-size: 15px;
+        line-height: 1.3;
+        font-weight: 600;
+    }
+
+    .dashboard-app-description {
+        color: #788e9f;
+        font-size: 11px;
+        line-height: 1.45;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .dashboard-app-arrow {
+        position: absolute;
+        right: 17px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9fb0bd;
+        font-size: 12px;
+        transition: color .15s ease, transform .15s ease;
+    }
+
+    .dashboard-app-card:hover .dashboard-app-arrow {
+        color: #1976bd;
+        transform: translate(3px, -50%);
+    }
+
+
+    /* ==========================================================
+           DESNO - PREGLED
+           ========================================================== */
+
+    .dashboard-overview {
+        width: 100%;
+        padding: 24px 26px 26px 26px;
+        background: #fff;
+        border: 1px solid #dce6ee;
+        border-radius: 10px;
+        box-shadow: 0 4px 18px rgba(35, 75, 105, .05);
+        box-sizing: border-box;
+    }
+
+    .overview-header {
+        min-height: 62px;
+        padding-bottom: 17px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e5edf2;
+        box-sizing: border-box;
+    }
+
+        .overview-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #304d64;
+        }
+
+        .overview-header span {
+            display: block;
+            margin-top: 3px;
+            font-size: 12px;
+            color: #8296a7;
+        }
+
+
+    /* ==========================================================
+           BLOKOVI STATISTIKE
+           ========================================================== */
+
+    .overview-groups-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .overview-box {
+        min-width: 0;
+        background: #fafdff;
+        border: 1px solid #dfe8ef;
+        border-radius: 9px;
+        overflow: hidden;
+    }
+
+    .overview-box-full {
+        grid-column: 1 / -1;
+    }
+
+    .overview-box-header {
+        min-height: 53px;
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        background: #f2f8fc;
+        border-bottom: 1px solid #dfe8ef;
+        color: #3c5e77;
+        font-size: 14px;
+        font-weight: 600;
+        box-sizing: border-box;
+    }
+
+    .overview-icon {
+        width: 32px;
+        min-width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 9px;
+        border-radius: 7px;
+        font-size: 13px;
+    }
+
+        .overview-icon.blue {
+            color: #1684c5;
+            background: #e3f2fb;
+        }
+
+        .overview-icon.turquoise {
+            color: #0f9e9a;
+            background: #e3f7f5;
+        }
+
+        .overview-icon.red {
+            color: #df4d5d;
+            background: #fcebed;
+        }
+
+    .overview-box-body {
+        padding: 4px 14px 10px 14px;
+    }
+
+
+    /* ==========================================================
+           KPI - SVA TRI ISTA ŠIRINA I VISINA
+           ========================================================== */
+
+    .overview-stats {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 0 !important;
+        width: 100%;
+        margin: 0 !important;
+        padding: 12px 0 14px 0 !important;
+    }
+
+        /* Svaka statistika */
+        .overview-stats > div {
+            width: 100% !important;
+            height: 105px !important;
+            min-height: 105px !important;
+            margin: 0 !important;
+            padding: 0 18px !important;
+            display: flex !important;
+            align-items: stretch !important;
+            border-right: 1px solid #e4ebf0;
+            box-sizing: border-box !important;
+        }
+
+            .overview-stats > div:last-child {
+                border-right: none;
+            }
+
+        /* Uklanjamo izgled kartice */
+        .overview-stats .bcard {
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 4px 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            background: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+
+            /* Naziv */
+            .overview-stats .bcard h6 {
+                width: 100%;
+                min-height: 40px;
+                margin: 0 !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                font-size: 13px !important;
+                line-height: 1.3;
+                font-weight: 500 !important;
+                color: #536b7d !important;
+            }
+
+            /* Dio sa brojem */
+            .overview-stats .bcard > div {
+                width: 100%;
+                margin: auto 0 0 0 !important;
+                text-align: center !important;
+            }
+
+                /* Broj */
+                .overview-stats .bcard > div span {
+                    font-size: 26px !important;
+                    line-height: 1;
+                    font-weight: 600 !important;
+                    color: #52789a !important;
+                }
+
+
+    /* ==========================================================
+           USER DROPDOWN - CUSTOM, BEZ POPPER-a
+           Ovi stilovi rade ako _LoginPartial koristi:
+           top-user-menu / topUserToggle / topUserDropdown
+           ========================================================== */
+
+    .admin-navbar,
+    .admin-navbar-right,
+    .admin-user {
+        overflow: visible !important;
+    }
+
+    .admin-user {
+        position: relative;
+        z-index: 1000;
+    }
+
+    .top-user-menu {
+        position: relative;
+        height: 100%;
+    }
+
+    .top-user-toggle {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        background: transparent !important;
+        border: 0 !important;
+        outline: none !important;
+        box-shadow: none !important;
+        cursor: pointer;
+    }
+
+    .top-user-image {
+        display: block !important;
+        width: 38px !important;
+        min-width: 38px !important;
+        max-width: 38px !important;
+        height: 38px !important;
+        min-height: 38px !important;
+        max-height: 38px !important;
+        margin: 0 10px 0 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 50% !important;
+        object-fit: cover !important;
+    }
+
+    .top-user-name {
+        display: block;
+        max-width: 230px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #1767b0;
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .top-user-arrow {
+        margin-left: 9px;
+        color: #71899a;
+        font-size: 11px;
+        transition: transform .15s ease;
+    }
+
+    .top-user-menu.open .top-user-arrow {
+        transform: rotate(180deg);
+    }
+
+    .top-user-dropdown {
+        position: absolute;
+        top: calc(100% + 2px);
+        right: 0;
+        width: 205px;
+        display: none;
+        padding: 6px 0;
+        background: #fff;
+        border: 1px solid #dce5eb;
+        border-radius: 7px;
+        box-shadow: 0 8px 24px rgba(30, 70, 100, .14);
+        z-index: 9999;
+    }
+
+    .top-user-menu.open .top-user-dropdown {
+        display: block !important;
+    }
+
+    .top-user-item {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        padding: 10px 14px;
+        background: transparent !important;
+        border: 0 !important;
+        color: #466177;
+        font-size: 13px;
+        text-align: left;
+        text-decoration: none !important;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+
+        .top-user-item i {
+            width: 20px;
+            margin-right: 8px;
+            text-align: center;
+        }
+
+        .top-user-item:hover {
+            background: #f2f8fc !important;
+            color: #176fae;
+        }
+
+    .top-user-divider {
+        height: 1px;
+        margin: 5px 0;
+        background: #e6edf2;
+    }
+
+    .top-user-dropdown form {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+
+    /* ==========================================================
+           RESPONSIVE
+           ========================================================== */
+
+    @@media (max-width: 1350px) {
+
+        .dashboard-home {
+            grid-template-columns: 340px minmax(0, 1fr);
+            gap: 20px;
+        }
+    }
+
+    @@media (max-width: 1200px) {
+
+        .overview-groups-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .overview-box-full {
+            grid-column: auto;
+        }
+    }
+
+    @@media (max-width: 950px) {
+
+        .dashboard-home {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-app-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 700px) {
+
+        .overview-stats {
+            grid-template-columns: 1fr !important;
+            grid-auto-rows: 104px;
+        }
+
+        .dashboard-app-list {
+            grid-template-columns: 1fr;
+        }
+    }
+
+</style>
+
+
+
+<script src="~/js/app/Dashboard.js"></script>
+
+@section Scripts
+{
+    <script>
+
+        $(document).ready(function () {
+
+            loadApplications();
+
+            var voterStat =
+                @Html.Raw(JsonConvert.SerializeObject(ViewBag.voterStat));
+
+            renderVoterStat(voterStat);
+
+
+            var psStat =
+                @Html.Raw(JsonConvert.SerializeObject(ViewBag.psStat));
+
+            var coalStat =
+                @Html.Raw(JsonConvert.SerializeObject(ViewBag.coalStat));
+
+            renderPSStat(psStat, coalStat);
+        });
+
+
+        function loadApplications() {
+
+            $.ajax({
+                url: '@Url.Action("GetMenu", "Dashboard")',
+                type: 'POST',
+                data: {},
+                cache: false,
+                dataType: "json"
+            })
+            .done(function (result) {
+
+                var apps = result.applications;
+                var culture = result.culture;
+
+                var html = "";
+
+                for (var i = 0; i < apps.length; i++) {
+
+                    var app = apps[i];
+
+                    var name = app.NameBs;
+                    var description = app.DescriptionBs;
+                    var shortName = app.ShortNameBs;
+
+                    switch (culture) {
+
+                        case "hr-BA":
+                            name = app.NameHr;
+                            description = app.DescriptionHr;
+                            shortName = app.ShortNameHr;
+                            break;
+
+                        case "bs-Cyrl-BA":
+                            name = app.NameSr;
+                            description = app.DescriptionSr;
+                            shortName = app.ShortNameSr;
+                            break;
+                    }
+
+                    if (!shortName)
+                        shortName = name;
+
+                    if (!description)
+                        description = name;
+
+
+                    var url;
+
+                    if (app.Id == 4) {
+                        url = app.Url;
+                    }
+                    else {
+                        url = "/Dashboard/Applications/?id=" + app.Url;
+                    }
+
+
+                    html += `
+                        <a href="${url}" class="dashboard-app-card">
+
+                            <div class="dashboard-app-icon">
+                                <i class="${app.Icon}"></i>
+                            </div>
+
+                            <div class="dashboard-app-info">
+
+                                <div class="dashboard-app-title">
+                                    ${shortName}
+                                </div>
+
+                                <div class="dashboard-app-description">
+                                    ${description}
+                                </div>
+
+                            </div>
+
+                            <div class="dashboard-app-arrow">
+                                <i class="fa fa-chevron-right"></i>
+                            </div>
+
+                        </a>
+                    `;
+                }
+
+                $("#applications").html(html);
+            });
+        }
+    </script>
+}

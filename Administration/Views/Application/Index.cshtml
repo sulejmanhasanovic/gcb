@@ -1,0 +1,57 @@
+﻿@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = @Localizer["Aplikacije"];
+}
+@{
+
+    List<object> commands = new List<object>();
+    commands.Add(new { type = "Edit", buttonOption = new { iconCss = "e-icons e-edit text-primary", cssClass = "e-flat text-primary" } });
+    // commands.Add(new { type = "Delete", buttonOption = new { iconCss = "e-icons e-delete text-danger", cssClass = "e-flat text-danger" } });
+    commands.Add(new { type = "Save", buttonOption = new { iconCss = "e-icons e-update", cssClass = "e-flat" } });
+    commands.Add(new { type = "Cancel", buttonOption = new { iconCss = "e-icons e-cancel-icon", cssClass = "e-flat" } });
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+
+}
+
+	<div tabindex="0" class="e-card" id="basic_card">
+		<div class="e-card-header">
+			<div class="e-card-header-caption">
+				<div class="e-card-header-title"><h3>@Localizer["Aplikacije"]</h3></div>
+				<div class="e-card-sub-title">@Localizer["Podešavanje aplikacija"]</div>
+			</div>
+		</div>
+		<div class="e-card-content">
+            <ejs-grid id="gridData" allowFiltering="true" 
+                 dataSource="@ViewBag.Applications"  
+                allowTextWrap="true" allowExcelExport="true"  
+                allowSorting="true" 
+                toolbar="@(new List<string>() { "Add"})" 
+                allowPaging="true" locale="@requestCulture.RequestCulture.UICulture.Name">
+            <e-data-manager url="/Application/UrlDatasource" crudUrl="/Application/CrudUpdate" adaptor="UrlAdaptor"></e-data-manager>
+            <e-grid-editSettings allowAdding="true" allowDeleting="true" allowEditing="true" mode="Normal" showConfirmDialog="true" showDeleteConfirmDialog="true"></e-grid-editSettings>
+
+            <e-grid-pagesettings pageCount="10" pageSize="17"></e-grid-pagesettings>
+            <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+            <e-grid-selectionsettings type="Single"></e-grid-selectionsettings>
+            <e-grid-selectionsettings mode="Row"></e-grid-selectionsettings>
+            <e-grid-columns>
+                <e-grid-column headerText="" width="50px" commands="commands"></e-grid-column>
+                <e-grid-column field="Id" headerText="Id" isPrimaryKey="true" width="100px" visible="false"></e-grid-column>
+                <e-grid-column field="NameBs" headerText="@Localizer["Naziv bosanski"].Value" width="150px"></e-grid-column>
+                <e-grid-column field="NameHr" headerText="@Localizer["Naziv hrvatski"].Value" width="150px"></e-grid-column>
+                <e-grid-column field="NameSr" headerText="@Localizer["Naziv srpski"].Value" width="150px"></e-grid-column>
+                <e-grid-column field="DescriptionBs" headerText="@Localizer["Opis bosanski"].Value" width="150px"></e-grid-column>
+                <e-grid-column field="DescriptionHr" headerText="@Localizer["Opis hrvatski"].Value" width="150px"></e-grid-column>
+                <e-grid-column field="DescriptionSr" headerText="@Localizer["Opis srpski"].Value" width="150px"></e-grid-column>
+                <e-grid-column field="Url" headerText="@Localizer["Link"].Value" width="150px"></e-grid-column>
+                <e-grid-column field="Icon" headerText="@Localizer["Slika"].Value" width="100px"></e-grid-column>
+                <e-grid-column field="Active" headerText="@Localizer["Aktivno"].Value" displayAsCheckBox="true" type="boolean" editType="booleanedit" width="100px"></e-grid-column>
+              @*  <e-grid-column field="openDate" headerText="@Localizer["Datum otvaranja"].Value"  editType="datepickeredit" customFormat="@(new {type = "datetime", format = "dd.MM.yyyy" })" width="150px"></e-grid-column>
+                <e-grid-column field="closeDate" headerText="@Localizer["Datum zatvaranja"].Value"  editType="datepickeredit" customFormat="@(new {type = "datetime", format = "dd.MM.yyyy" })" width="150px"></e-grid-column>*@
+@*                <e-grid-column field="notification" headerText="@Localizer["Poruka"].Value" width="250px"></e-grid-column>
+*@            </e-grid-columns>
+        </ejs-grid>
+         </div>
+    </div>

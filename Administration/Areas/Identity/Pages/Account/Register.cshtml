@@ -1,0 +1,158 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using AspNetCore.ReCaptcha
+@using System.Collections
+@model RegisterModel
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IViewLocalizer Localizer
+@{
+
+	ViewData["Title"] = @Localizer["Registracija za elektronski pristup"];
+	 //var select = new SelectList((IEnumerable)ViewData["Applications"], "Id", "Name"); 
+}
+
+@if((Boolean)ViewData["Closed"]==true){
+	<div class="container">
+	<div class="row-content">
+		<div class="col-md-4 offset-md-4">
+			<section>
+				<span>@Localizer["Podnošenje prijava za glasanje izvan Bosne i Hercegovine je završeno / Подношење пријава за гласање изван Босне и Херцеговине је завршено."]</span>
+
+			</section>
+		</div>
+	</div>
+	</div>
+}else{
+
+<div class="container">
+	<div class="row-content">
+		<div class="col-md-4 offset-md-4">
+			<section>
+
+				<form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+					<h4>@Localizer["Registracija za elektronski pristup"]</h4>
+					<hr />
+					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+					<div class="form-floating">
+						<input asp-for="Input.FirstName" class="form-control" autocomplete="FirstName" aria-required="true" />
+						<label asp-for="Input.FirstName">@Localizer["Ime"]</label>
+						<span asp-validation-for="Input.FirstName" class="text-danger"></span>
+					</div>
+					<br />
+					<div class="form-floating">
+						<input asp-for="Input.LastName" class="form-control" autocomplete="LastName" aria-required="true" />
+						<label asp-for="Input.LastName">@Localizer["Prezime"]</label>
+						<span asp-validation-for="Input.LastName" class="text-danger"></span>
+					</div>
+					<br />
+					<div class="form-floating">
+						<input asp-for="Input.JMBG" class="form-control" autocomplete="" aria-required="true" onkeyup="this.value=this.value.replace(/[^0-9]/g,'');" />
+						<label asp-for="Input.JMBG">@Localizer["JMB"]</label>
+						<span asp-validation-for="Input.JMBG" class="text-danger"></span>
+					</div>
+					<br />
+					<div class="form-floating">
+						<input asp-for="Input.Email" class="form-control" autocomplete="Email" aria-required="true" />
+						<label asp-for="Input.Email">@Localizer["E-mail"]</label>
+						<span asp-validation-for="Input.Email" class="text-danger"></span>
+
+					</div>
+					<br />
+					<div class="form-floating">
+						<input asp-for="Input.PhoneNumber" class="form-control" autocomplete="PhoneNumber" aria-required="true" />
+						<label asp-for="Input.PhoneNumber">@Localizer["Telefon"]</label>
+						<span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+
+					</div>
+					<br/>
+					<div>
+						
+@*						<ejs-dropdownlist  dataSource=@select.Items
+														  popupHeight="220px" width="100%" id="Applications"
+														  name="Applications" placeholder="@Localizer["Aplikacija"]" allowFiltering="true"
+														  cssClass="e-custom">
+												<e-dropdownlist-fields text="Name" value="Id"></e-dropdownlist-fields>
+											</ejs-dropdownlist>*@
+@*					@Html.DropDownList("Applications", (IEnumerable<SelectListItem>)ViewData["Applications"], new { @class = "form-select form-select-lg mb-3" })*@
+					</div>
+					<br />
+					<div class="form-floating p-1">
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" asp-for="Input.Agree" checked disabled>
+							<label class="form-check-label" for="flexCheckChecked">
+								@Localizer["Saglasan sam s"] 
+								<a data-bs-toggle="modal" data-bs-target="#privacyModal"><span class="text-primary" style="cursor:pointer">@Localizer["uslovima korištenja"]</span></a>
+								@Localizer["i obradom ličnih podataka od strane Centralne izborne komisije BiH"].
+							</label>
+						</div>
+						<span asp-validation-for="Input.Agree" class="text-danger"></span>
+
+					</div>
+					<br />
+					<div class="form-floating p-1">
+						<div>
+							@Localizer["Jezik za komunikaciju s CIK BiH"]
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" asp-for="Input.Language" id="bs" value="B">
+							<label class="form-check-label" for="bs">
+								@Localizer["Bosanski"]
+							</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" asp-for="Input.Language" id="hr" value="H">
+							<label class="form-check-label" for="hr">
+								@Localizer["Hrvatski"]
+							</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" asp-for="Input.Language" id="sr" value="S">
+							<label class="form-check-label" for="sr">
+								@Localizer["Srpski"]
+							</label>
+						</div>
+					</div>
+					<button id="registerSubmit" type="submit" class="w-100 btn-primary_">@Localizer["Podnesi zahtjev za pristup"]</button>
+				@Html.ReCaptcha()
+                <recaptcha />
+				</form>
+			</section>
+
+
+		</div>
+
+		@*         <div class="col-md-4 offset-md-4 top20">
+			<div class="alert alert-warning">
+			<span class="text-muted"> @Localizer["Nakon podnošenja zahtjeva dobit ćete email sa informacijama o narednim koracima"]</span>
+			</div>
+			</div>*@
+
+
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-6">
+ <div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">@Localizer["Uslovi korištenja"]</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <partial name="_TermsOfUse" />
+      </div>
+      <div class="modal-footer">
+		   <button type="button" class="btn btn-primary" data-bs-dismiss="modal">@Localizer["Zatvori"]</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+}
+@section Scripts {
+<partial name="_ValidationScriptsPartial" />
+}

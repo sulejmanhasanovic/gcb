@@ -1,0 +1,568 @@
+﻿@page
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@using AspNetCore.ReCaptcha
+
+@model LoginModel
+
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["Prijava"];
+    ViewBag.showCookie = false;
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="bs">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"]</title>
+
+
+    <!-- =========================================================
+         CSS
+         ========================================================= -->
+
+    <link rel="stylesheet"
+          href="~/lib/ace/bootstrap.css" />
+
+    <link rel="stylesheet"
+          href="~/lib/font-awesome/css/fontawesome.min.css" />
+
+    <link rel="stylesheet"
+          href="~/lib/font-awesome/css/regular.min.css" />
+
+    <link rel="stylesheet"
+          href="~/lib/font-awesome/css/brands.min.css" />
+
+    <link rel="stylesheet"
+          href="~/lib/font-awesome/css/solid.min.css" />
+
+    <link rel="stylesheet"
+          href="~/lib/ace/ace.min.css" />
+
+    <link rel="stylesheet"
+          href="~/lib/ace/ace-themes.css" />
+
+
+    <style>
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+            margin: 0;
+        }
+
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #34495e;
+            background: radial-gradient( circle at 50% 32%, rgba(255,255,255,1) 0%, rgba(248,251,253,.98) 35%, rgba(237,244,249,.98) 70%, rgba(228,239,247,1) 100% );
+        }
+
+
+        /* =========================================================
+                   PAGE
+                   ========================================================= */
+
+        .login-page {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+
+            /* blagi dekor lijevo */
+
+            .login-page::before {
+                content: "";
+                position: absolute;
+                width: 650px;
+                height: 650px;
+                left: -330px;
+                top: -170px;
+                border-radius: 50%;
+                background: radial-gradient( circle, rgba(25,118,189,.09) 0%, rgba(25,118,189,.025) 48%, transparent 70% );
+                pointer-events: none;
+            }
+
+
+            /* blagi dekor desno dole */
+
+            .login-page::after {
+                content: "";
+                position: absolute;
+                width: 750px;
+                height: 750px;
+                right: -390px;
+                bottom: -310px;
+                border-radius: 50%;
+                background: radial-gradient( circle, rgba(25,118,189,.10) 0%, rgba(25,118,189,.025) 50%, transparent 70% );
+                pointer-events: none;
+            }
+
+
+        /* =========================================================
+                   LOGIN CONTENT
+                   ========================================================= */
+
+        .login-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 500px;
+            padding: 11vh 25px 80px 25px;
+        }
+
+
+        /* =========================================================
+                   LOGO
+                   ========================================================= */
+
+        .cik-logo {
+            width: 100%;
+            margin-bottom: 38px;
+            text-align: center;
+        }
+
+
+            .cik-logo img {
+                display: block;
+                width: 100%;
+                max-width: 470px;
+                height: auto;
+                margin: 0 auto;
+            }
+
+
+        /* =========================================================
+                   LOGIN TITLE
+                   ========================================================= */
+
+        .login-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 22px;
+            color: #34495e;
+            font-size: 21px;
+            font-weight: 400;
+        }
+
+
+        .login-title-icon {
+            margin-right: 10px;
+            color: #f39c12;
+            font-size: 19px;
+        }
+
+
+        .login-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            margin-left: 15px;
+            background: #d5e0e8;
+        }
+
+
+        /* =========================================================
+                   FORM
+                   ========================================================= */
+
+        .login-form-group {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+
+        .login-input-wrapper {
+            position: relative;
+        }
+
+
+        .login-input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a8b6c2;
+            font-size: 14px;
+            z-index: 2;
+        }
+
+
+        .login-input {
+            width: 100%;
+            height: 50px;
+            padding: 0 15px 0 43px;
+            box-sizing: border-box;
+            background: rgba(255,255,255,.96);
+            border: 1px solid #ccd8e1;
+            border-radius: 4px;
+            color: #34495e;
+            font-size: 15px;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(30,70,100,.025);
+            transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+        }
+
+
+            .login-input::placeholder {
+                color: #98a8b5;
+            }
+
+
+            .login-input:focus {
+                background: #fff;
+                border-color: #2780b9;
+                box-shadow: 0 0 0 3px rgba(39,128,185,.08);
+            }
+
+
+        /* =========================================================
+                   VALIDATION
+                   ========================================================= */
+
+        .field-validation-error {
+            display: block;
+            margin-top: 4px;
+            color: #d84b59;
+            font-size: 11px;
+        }
+
+
+        .login-validation {
+            margin-bottom: 8px;
+            color: #d84b59;
+            font-size: 12px;
+        }
+
+
+        /* =========================================================
+                   FORGOT PASSWORD
+                   ========================================================= */
+
+        .forgot-password {
+            margin-top: -5px;
+            margin-bottom: 14px;
+            text-align: right;
+        }
+
+
+            .forgot-password a {
+                color: #1976bd;
+                font-size: 13px;
+                text-decoration: none;
+            }
+
+
+                .forgot-password a:hover {
+                    color: #145f96;
+                    text-decoration: underline;
+                }
+
+
+        /* =========================================================
+                   BUTTON
+                   ========================================================= */
+
+        .login-button {
+            width: 100%;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1976bd;
+            border: 1px solid #1976bd;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background .15s ease, border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+        }
+
+
+            .login-button:hover {
+                background: #14689f;
+                border-color: #14689f;
+                box-shadow: 0 5px 14px rgba(25,118,189,.18);
+            }
+
+
+            .login-button:active {
+                transform: translateY(1px);
+            }
+
+
+            .login-button i {
+                margin-right: 7px;
+            }
+
+
+        /* =========================================================
+                   CAPTCHA
+                   ========================================================= */
+
+        .login-captcha {
+            margin-top: 18px;
+            display: flex;
+            justify-content: center;
+        }
+
+
+        /* =========================================================
+                   FOOTER
+                   ========================================================= */
+
+        .login-footer {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 24px;
+            z-index: 2;
+            text-align: center;
+            color: #8296a6;
+            font-size: 11px;
+        }
+
+
+        .login-footer-title {
+            margin-bottom: 3px;
+            color: #607b8f;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+
+        /* =========================================================
+                   RESPONSIVE
+                   ========================================================= */
+
+        @@media (max-width: 600px) {
+
+            .login-wrapper {
+                max-width: 430px;
+                padding-top: 8vh;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+
+            .cik-logo {
+                margin-bottom: 30px;
+            }
+
+
+                .cik-logo img {
+                    max-width: 410px;
+                }
+
+
+            .login-title {
+                font-size: 18px;
+            }
+
+
+            .login-footer {
+                position: relative;
+                margin-top: 30px;
+                bottom: auto;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="login-page">
+
+
+        <div class="login-wrapper">
+
+
+            <!-- =====================================================
+                 CIK LOGO
+                 ===================================================== -->
+
+            <div class="cik-logo">
+
+                <img src="~/images/logo.png"
+                     alt="Centralna izborna komisija Bosne i Hercegovine" />
+
+            </div>
+
+
+            <!-- =====================================================
+                 TITLE
+                 ===================================================== -->
+
+            <div class="login-title">
+
+                <span class="login-title-icon">
+                    <i class="fa fa-cogs"></i>
+                </span>
+
+                <span>
+                    @Localizer["Prijava u elektronski sistem"]
+                </span>
+
+            </div>
+
+
+            <!-- =====================================================
+                 LOGIN FORM
+                 ===================================================== -->
+
+            <form autocomplete="off"
+                  id="account"
+                  method="post">
+
+
+                <!-- VALIDATION -->
+
+                <div asp-validation-summary="ModelOnly"
+                     class="login-validation">
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="login-form-group">
+
+                    <div class="login-input-wrapper">
+
+                        <i class="fa fa-user login-input-icon"></i>
+
+                        <input asp-for="Input.Email"
+                               id="id-login-username"
+                               class="login-input"
+                               placeholder="@Localizer["E-mail"]"
+                               autocomplete="username"
+                               aria-required="true" />
+
+                    </div>
+
+                    <span asp-validation-for="Input.Email"
+                          class="field-validation-error">
+                    </span>
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="login-form-group">
+
+                    <div class="login-input-wrapper">
+
+                        <i class="fa fa-lock login-input-icon"></i>
+
+                        <input asp-for="Input.Password"
+                               id="id-login-password"
+                               class="login-input"
+                               placeholder="@Localizer["Šifra"]"
+                               autocomplete="current-password"
+                               aria-required="true" />
+
+                    </div>
+
+                    <span asp-validation-for="Input.Password"
+                          class="field-validation-error">
+                    </span>
+
+                </div>
+
+
+                <!-- FORGOT PASSWORD -->
+
+                <div class="forgot-password">
+
+                    <a asp-area="Identity"
+                       asp-page="/Account/ForgotPassword">
+
+                        @Localizer["Zaboravljena šifra?"]
+
+                    </a>
+
+                </div>
+
+
+                <!-- LOGIN BUTTON -->
+
+                <button id="login-submit"
+                        type="submit"
+                        class="login-button">
+
+                    <i class="fa fa-sign-in-alt"
+                       aria-hidden="true">
+                    </i>
+
+                    @Localizer["Prijava"]
+
+                </button>
+
+
+                <!-- CAPTCHA -->
+
+                <div class="login-captcha">
+
+                    @Html.ReCaptcha()
+
+                    <recaptcha />
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- =========================================================
+             FOOTER
+             ========================================================= -->
+
+        <div class="login-footer">
+
+            <div class="login-footer-title">
+                @Localizer["Centralna izborna komisija Bosne i Hercegovine"]
+            </div>
+
+            <div>
+                © @DateTime.Now.Year
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =============================================================
+         JAVASCRIPT
+         ============================================================= -->
+
+    <script src="~/lib/ace/jquery.js"></script>
+
+    <script src="~/lib/ace/bootstrap.js"></script>
+
+    <partial name="_ValidationScriptsPartial" />
+
+</body>
+
+</html>

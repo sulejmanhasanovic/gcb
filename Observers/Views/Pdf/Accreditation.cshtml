@@ -1,0 +1,225 @@
+﻿@model Observers.Models.PdfAccreditation
+
+@{
+    Layout = "";
+}
+
+@using QRCoder
+@using System.Text;
+@functions {
+public string GenerateQr(string text)
+{
+    text = text?.Normalize(NormalizationForm.FormC);
+
+    using (var qrGenerator = new QRCodeGenerator())
+    {
+        var qrData = qrGenerator.CreateQrCode(
+            plainText: text,
+            eccLevel: QRCodeGenerator.ECCLevel.Q,
+            forceUtf8: true,
+            utf8BOM: true,
+            eciMode: QRCodeGenerator.EciMode.Utf8
+        );
+
+        var qrCode = new PngByteQRCode(qrData);
+        byte[] qrBytes = qrCode.GetGraphic(6);
+
+        return "data:image/png;base64," + Convert.ToBase64String(qrBytes);
+    }
+}
+}
+
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 287mm;
+        height: 200mm;
+        background: white;
+    }
+
+    .sheet {
+        width: 280mm;
+        height: 187mm;
+        margin: 0 auto;
+        font-size: 0;
+        position: relative;
+        page-break-after: always;
+        overflow: hidden;
+        background: white;
+    }
+
+    .badge {
+        position: relative;
+        display: inline-block;
+        vertical-align: top;
+        width: 68mm;
+        height: 187mm;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-size: 12pt;
+    }
+
+    .bgimg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 68mm;
+        height: 187mm;
+        z-index: 0;
+    }
+
+    .field {
+        position: absolute;
+        z-index: 2;
+        color: #000;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .qr {
+        position: absolute;
+        top: 15mm;
+        right: 3mm;
+        width: 20mm;
+        height: 20mm;
+        z-index: 3;
+    }
+
+    .accps {
+        top: 18mm;
+        left: 23mm;
+        font-size: 16pt;
+        font-weight: 700;
+    }
+
+    .ime {
+        top: 34.0mm;
+        left: 20.0mm;
+        font-size: 12pt;
+        font-weight: 700;
+        max-width: 40mm;
+        overflow: hidden;
+    }
+
+    .prezime {
+        top: 40mm;
+        left: 22mm;
+        font-size: 12pt;
+        font-weight: 700;
+        max-width: 40mm;
+        overflow: hidden;
+    }
+
+    .accnumber {
+        top: 58mm;
+        left: 20mm;
+        font-size: 10pt;
+        font-weight: 600;
+    }
+
+    .accdate {
+        top: 65.0mm;
+        left: 20mm;
+        font-size: 10pt;
+        font-weight: 600;
+    }
+
+    .print-3 .accdate {
+        top: 61.5mm;
+        left: 20mm;
+        font-size: 10pt;
+        font-weight: 600;
+    }
+
+    .print-3 .accnumber {
+        top: 55.5mm;
+        left: 20mm;
+        font-size: 10pt;
+        font-weight: 600;
+    }
+
+    .v1 {
+        left: 70mm;
+    }
+
+    .v2 {
+        left: 140mm;
+    }
+
+    .cut-line-v {
+        position: absolute;
+        top: 0;
+        height: 187mm;
+        border-left: 0.2mm dashed #888;
+        z-index: 20;
+    }
+</style>
+
+@{
+    var observers = Model.observers.ToList();
+    int perPage = 4;
+    int totalPages = (int)Math.Ceiling((double)observers.Count / perPage);
+    var templatePath = System.IO.Path.GetDirectoryName(Model.path);
+}
+
+@for (int page = 0; page < totalPages; page++)
+{
+    var pageItems = observers.Skip(page * perPage).Take(perPage).ToList();
+
+    <div class="sheet">
+
+        <!-- CUT LINES -->
+        <div class="cut-line-v v1"></div>
+        <div class="cut-line-v v2"></div>
+
+        @foreach (var item in pageItems)
+        {
+            var qrText = $"{item.Id}|{item.FirstName}|{item.LastName}|{Model.AccNumber}";
+            var qrImage = GenerateQr(qrText);
+
+            string templateFile;
+
+            switch (Model.main.AccreditationTypeId)
+            {
+                case 1:
+                    templateFile = $"1{item.Language}.jpg";
+                    break;
+
+                case 2:
+                    templateFile = $"2{item.Language}.jpg";
+                    break;
+
+                case 3:
+                    templateFile = "3.jpg";
+                    break;
+
+                default:
+                    templateFile = System.IO.Path.GetFileName(Model.path);
+                    break;
+            }
+
+            var observerTemplate = System.IO.Path.Combine(templatePath, templateFile);
+
+            <div class="badge print-@Model.main.AccreditationTypeId">
+                <img class="bgimg" src="@Url.Content(observerTemplate)" />
+                <img class="qr" src="@qrImage" />
+
+                <div class="field accps">@item.AccreditationObserverId</div>
+                <div class="field ime">
+                    @(item.Language == "S"
+                                ? Observers.Helpers.Converter.ConvertToCyrillic(item.FirstName)
+                                : item.FirstName)
+                </div>
+                <div class="field prezime">
+                    @(item.Language == "S"
+                                ? Observers.Helpers.Converter.ConvertToCyrillic(item.LastName)
+                                : item.LastName)
+        </div>
+                <div class="field accnumber">@item.DecisionNumber</div>
+                <div class="field accdate">@item.DecisionDate</div>
+            </div>
+        }
+    </div>
+}

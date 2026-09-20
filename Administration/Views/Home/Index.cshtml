@@ -1,0 +1,98 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Localization
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+@{
+    ViewData["Title"] = "CIK BiH";
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+}
+
+<!-- ======= Hero Section ======= -->
+<section id="hero" class="d-flex align-items-center">
+    <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
+        <div class="row justify-content-center">
+            <div class="col-xl-7 col-lg-9 text-center mt70">
+
+               @*  <h6>@localizer["Dobrodošli na portal e-Izbori Centralne izborne komisije Bosne i Hercegovine"]</h6> *@
+                <h1><span><b><i style="font-size:larger">e</i></b></span>-@localizer["Izbori"]</h1>
+            </div>
+        </div>
+
+@*         <div class="row icon-boxes">
+            @foreach (var item in (IEnumerable<IdentityManager.Models.Application>)ViewBag.Applications)
+            {
+                var name = @item.NameBs;
+                var description = @item.DescriptionBs;
+                switch (requestCulture.RequestCulture.UICulture.Name.ToString())
+                {
+                    case "hr-BA":
+                        name = @item.NameHr;
+                        description = @item.DescriptionHr;
+                        break;
+
+                    case "bs-Cyrl-BA":
+                        name = @item.NameSr;
+                        description = @item.DescriptionSr;
+                        break;
+
+                }
+
+                <div class="col-md-4 col-lg-4 d-flex align-items-stretch mb-5 mb-lg-0" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="icon-box">
+                        @if (item.Active == true)
+                        {
+                            @if (item.Id.ToString() == "4")
+                            {
+                                <a href="https://eimovinskikartoni.izbori.ba">
+                                    <input type="hidden" id="Id" name="Id" value="@item.Id">
+                                    <div class="icon">
+                                        <i class="@item.Icon"></i>
+                                    </div>
+
+                                    <h4 class="title">@name</h4>
+                                    <p class="description">@description</p>
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="/Dashboard/Applications/?id=@item.Url">
+                                    <input type="hidden" id="Id" name="Id" value="@item.Id">
+                                    <div class="icon"><i class="@item.Icon"></i></div>
+                                    <h4 class="title">@name</h4>
+                                    <p class="description">@description</p>
+                                </a>
+                            }
+                        }
+                        else
+                        {
+                            <a data-bs-toggle="modal" data-bs-target="#applicationModal">
+                                <div class="icon"><i class="@item.Icon"></i></div>
+                                <h4 class="title">@name</h4>
+                                <p class="description">@description</p>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+
+        </div> *@
+    </div>
+</section><!-- End Hero -->
+
+<main id="main">
+    <div class="modal fade" id="applicationModal" tabindex="-1" aria-labelledby="applicationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">@localizer["CIK BiH"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @localizer["U pripremi"]
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main><!-- End #main -->

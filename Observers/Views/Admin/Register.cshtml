@@ -1,0 +1,104 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@model Observers.Controllers.AdminController.InputModel
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = "Centralna izborna komisija";
+}
+<div class="row">
+    <div class="col-md-4 offset-md-4">
+        <form id="registerForm" method="post" asp-controller="Admin" asp-action="SaveOBS">
+            <h4>@Localizer["Unos posmatrača"]</h4>
+            <hr />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="input-floating-label">
+           
+                <input asp-for="Name" class="form-control form-control-lg" autocomplete="Name" aria-required="true" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+                <span class="floating-label text-grey-m3">
+                       @Localizer["Naziv"]
+                    </span>
+            </div>
+            <br/>
+            <div class="input-floating-label">
+                <input asp-for="Address" class="form-control form-control-lg" autocomplete="Address" aria-required="true" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+               <span class="floating-label text-grey-m3">
+                       @Localizer["Adresa"]
+               </span>
+            </div>
+            
+               		<br />
+					<div class="form-floating p-1">
+						<div>
+							@Localizer["Vrsta organizacije"]
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" asp-for="IdType" id="bih" value="2">
+							<label class="form-check-label" for="bih">
+								@Localizer["Udruženje građana"]
+							</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" asp-for="IdType" id="ino" value="3">
+							<label class="form-check-label" for="ino">
+								@Localizer["Međunarodna organizacija"]
+							</label>
+						</div>
+                        <div class="form-check">
+							<input class="form-check-input" type="radio" asp-for="IdType" id="ps" value="1">
+							<label class="form-check-label" for="ps">
+								@Localizer["Politički subjekt"]
+							</label>
+						</div>
+
+					</div>
+					   <br/>
+            <div class="input-floating-label">
+                <input asp-for="Phone" class="form-control form-control-lg" autocomplete="" aria-required="true" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+                    <span class="floating-label text-grey-m3">
+                       @Localizer["Telefon"]
+                    </span>
+            </div>
+               <br/>
+            <div class="input-floating-label">
+              <input asp-for="Email"  class="form-control form-control-lg"  autocomplete="Email" aria-required="true"/>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+               <span class="floating-label text-grey-m3">
+                       @Localizer["E-mail"]
+                </span>
+
+            </div>
+            <br />
+					<div class="form-floating p-1">
+						<div>
+							@Localizer["Jezik za komunikaciju s CIK BiH"]
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" asp-for="Language" id="bs" value="B">
+							<label class="form-check-label" for="bs">
+								@Localizer["Bosanski"]
+							</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" asp-for="Language" id="hr" value="H">
+							<label class="form-check-label" for="hr">
+								@Localizer["Hrvatski"]
+							</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" asp-for="Language" id="sr" value="S">
+							<label class="form-check-label" for="sr">
+								@Localizer["Srpski"]
+							</label>
+						</div>
+					</div>
+                    <br/>
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-primary">@Localizer["Snimi podatke"]</button>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,428 @@
+﻿@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+
+
+
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = "e-posmatrači Administracija";
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    List<object> update = new List<object>();
+
+    update.Add(new
+    {
+        type = "Edit",
+        buttonOption = new
+        {
+            iconCss = "e-icons e-edit text-primary",
+            cssClass = "e-flat text-primary"
+        }
+    });
+
+    update.Add(new
+    {
+        type = "Delete",
+        buttonOption = new
+        {
+            iconCss = "e-icons e-delete text-danger",
+            cssClass = "e-flat text-danger"
+        }
+    });
+}
+;
+}
+
+<script type="text/javascript">
+    var UrlAdmin = {
+    StartDataEntry: '@Url.Action("StartDataEntry", "Admin")',
+    DeleteData: '@Url.Action("DeleteData", "Admin")',
+    UpdateNoOfDecision: '@Url.Action("UpdateNoOfDecision", "Admin")'
+    };
+    var translations = {
+    DeleteTitle: '@Localizer["Brisanje dokumenta"]',
+    AreYouSure: '@Localizer["Jeste li sigurni?"]',
+    Cancel: '@Localizer["Odustani"]',
+    Delete: '@Localizer["Izbriši"]',
+    SuccessDelete: '@Localizer["Uspješno izbrisano"]',
+    Warning: '@Localizer["UPOZORENJE"]',
+    SaveDataTitle: '@Localizer["Snimanje podataka"]',
+    Success: '@Localizer["Uspješno uneseno"]',
+    };
+</script>
+
+<div class="page-header pb-2">
+    <h1 class="page-title text-primary-d2 text-150">
+        @Localizer["Izbor organizacije za akreditaciju posmatrača"]
+        <small class=" page-info text-secondary-d2 text-nowrap hidden-xs hidden-sm" id="gr" style="visibility: hidden;"></small>
+        <small class=" page-info text-secondary-d2 text-nowraphidden-xs hidden-sm" id="tp" style="visibility: hidden;"></small>
+    </h1>
+</div>
+
+<div class="dropdown-divider brc-primary-l2"></div>
+
+<div class="space"></div>
+<div class="row">
+    <div class="col-md-12">
+
+        <ejs-grid id="gridData" allowFiltering="true" allowGrouping="true" dataSource="@ViewBag.Data"
+                  allowTextWrap="true" allowResizing="true"
+                  rowDataBound="rowBound" ,
+                  allowTextWrap="true" allowExcelExport="true" allowSorting="true" commandClick="commandClick"
+                  toolbarClick="toolbarClick" toolbar="@(new List<string>() { "ExcelExport", "Search" })" allowPaging="true"
+                  locale="@requestCulture.RequestCulture.UICulture.Name">
+
+            <e-grid-pagesettings pageCount="10" pageSize="15"></e-grid-pagesettings>
+            <e-grid-filterSettings type="Excel"></e-grid-filterSettings>
+            <e-grid-selectionsettings type="Single"></e-grid-selectionsettings>
+            <e-grid-selectionsettings mode="Row"></e-grid-selectionsettings>
+            <e-grid-columns>
+                <e-grid-column headerText="" width="75" commands="update"></e-grid-column>
+                <e-grid-column field="Id" headerText="ID" isPrimaryKey="true" width="50px" visible="false"></e-grid-column>
+                <e-grid-column field="Docstatus" headerText="@Localizer["Dokumanti"].Value" width="120px"></e-grid-column>
+                <e-grid-column field="Approved" headerText="@Localizer["Odobren"].Value" width="120px"></e-grid-column>
+                <e-grid-column field="AccreditationTypeId" headerText="@Localizer["Vrsta"].Value" width="120px"></e-grid-column>
+                <e-grid-column field="Name" headerText="@Localizer["Naziv"].Value" width="220px"></e-grid-column>
+                <e-grid-column field="Address" headerText="@Localizer["Adresa"].Value" visible="true" width="220px"> </e-grid-column>
+                <e-grid-column field="Telephone" headerText="@Localizer["Telefon"].Value" visible="true" width="140px"></e-grid-column>
+                <e-grid-column field="Email" headerText="@Localizer["Email"].Value" visible="true" width="140px"></e-grid-column>
+                <e-grid-column headerText=""
+                               width="70"
+                               template="#noDecisionTemplate"
+                               allowFiltering="false"
+                               allowSorting="false">
+                </e-grid-column>
+                <e-grid-column field="NoOfDecision" headerText="@Localizer["Broj protokola"].Value" width="140px" textAlign="Center"></e-grid-column>
+
+                <e-grid-column field="CIK" headerText="@Localizer["CIK"].Value" width="100"
+                               displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+                @* <e-grid-column field="GCB" headerText="@Localizer["GCB"].Value" width="100"
+  displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+ *@ <e-grid-column field="DKP" headerText="@Localizer["DKP"].Value" width="100"
+                                  displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+                @* <e-grid-column field="OIK" headerText="@Localizer["OIK"].Value" width="100"
+  displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+  <e-grid-column field="CBS" headerText="@Localizer["CBS"].Value" width="100"
+  displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+ *@ <e-grid-column field="BM" headerText="@Localizer["BM"].Value" width="100"
+                                  displayAsCheckBox="true" textAlign="Center" type="boolean" editType="booleanedit"></e-grid-column>
+            </e-grid-columns>
+        </ejs-grid>
+
+        <script id="noDecisionTemplate" type="text/x-template">
+
+            <button type="button"
+            class="btn btn-sm btn-outline-primary"
+            title="Uredi broj protokola"
+            onclick="editNoDecision(event)">
+            <i class="e-icons e-edit"></i>
+            </button>
+
+        </script>
+
+    </div>
+</div>
+
+
+<div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="infoModalTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <button title="Štampaj" class="btn btn-outline-primary radius-r-1 m-1" onclick="printData()">
+                <i class="fa-solid fa-print fa-lg"></i>
+            </button>
+            <div class="modal-body" id="printArea">
+                <table class="table">
+                    <tr>
+                        <td>JMBG</td>
+                        <td><span id="RegId"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Ime</td>
+                        <td><span id="FirstName"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Prezime</td>
+                        <td><span id="LastName"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Opština</td>
+                        <td><span id="CurrentMunicipalityCode"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Opština naziv</td>
+                        <td><span id="MunicipalityName"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Biračko mjesto</td>
+                        <td><span id="PollingStation"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Država</td>
+                        <td><span id="CountryName"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td><span id="StatusName"></span></td>
+                    </tr>
+                    <tr>
+                        <td>ID dokument</td>
+                        <td><span id="StatusDoc1"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Prebivalište</td>
+                        <td><span id="StatusDoc2"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Obrazac</td>
+                        <td><span id="StatusDoc3"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Tabela</td>
+                        <td><span id="Napomena"></span></td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function rowBound(e) {
+    if (e.data.Approved == 'DA') {
+    e.row.classList.add('status-4');
+    }
+    else if (e.data.Approved == 'NE' && e.data.Docstatus == 'Nema dokumenata') {
+    e.row.classList.add('status-2');
+    }
+    else if (e.data.Approved == 'NE' && e.data.Docstatus == 'Dokumenti unijeti') {
+    e.row.classList.add('status-1');
+    }
+    }
+
+    function commandClick(args) {
+
+    if (args.commandColumn.type == "Delete") {
+
+    bootbox.confirm({
+    closeButton: false,
+    title: "<div><i class='fa fa-exclamation-triangle text-red'></i> "
+    + translations.Warning + "</div>",
+    message: "<div>" + translations.AreYouSure + "</div>",
+    buttons: {
+    cancel: {
+    label: '<i class="fa fa-check"></i> ' + translations.Cancel,
+    className: 'btn-danger'
+    },
+    confirm: {
+    label: '<i class="fa fa-times"></i> ' + translations.Delete,
+    className: 'btn-success'
+    }
+    },
+    callback: function(result) {
+
+    if (!result)
+    return;
+
+    $.ajax({
+    type: "POST",
+    url: UrlAdmin.DeleteData,
+    data: {
+    id: args.rowData.Id
+    }
+    })
+    .done(function(response) {
+
+    showMessage(
+    translations.SaveDataTitle,
+    translations.SuccessDelete,
+    'success'
+    );
+
+    var grid =
+    document.getElementById("gridData").ej2_instances[0];
+
+    grid.dataSource = response.observer;
+    grid.refresh();
+    })
+    .fail(function(jqXHR) {
+    console.log(jqXHR.responseText);
+    });
+    }
+    });
+
+    return;
+    }
+
+
+    if (args.commandColumn.type == "Edit") {
+
+    $.ajax({
+    type: "POST",
+    url: UrlAdmin.StartDataEntry,
+    data: {
+    id: args.rowData.Id,
+    language: args.rowData.Language
+    }
+    })
+    .done(function(response) {
+    window.location.href = response.url;
+    })
+    .fail(function(jqXHR) {
+    console.log(jqXHR.responseText);
+    });
+
+    return;
+    }
+    }
+
+    function editNoDecision(e) {
+
+    if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    }
+
+    const grid =
+    document.getElementById("gridData").ej2_instances[0];
+
+    const rowInfo = grid.getRowInfo(e.target);
+
+    if (!rowInfo || !rowInfo.rowData)
+    return;
+
+    const row = rowInfo.rowData;
+
+    const current = row.NoOfDecision || '';
+
+    const newVal = prompt(
+    'Unesite broj protokola',
+    current
+    );
+
+    if (newVal === null)
+    return;
+
+    $.ajax({
+    url: UrlAdmin.UpdateNoOfDecision,
+    type: 'POST',
+    data: {
+    id: row.Id,
+    noOfDecision: newVal
+    }
+    })
+    .done(function(res) {
+
+    if (res.status !== 'Success') {
+
+    showMessage(
+    translations.SaveDataTitle,
+    res.message || 'Error',
+    'danger'
+    );
+
+    return;
+    }
+
+    row.NoOfDecision = newVal;
+
+    grid.refresh();
+
+    showMessage(
+    translations.SaveDataTitle,
+    translations.Success,
+    'success'
+    );
+    })
+    .fail(function(xhr) {
+
+    showMessage(
+    translations.SaveDataTitle,
+    xhr.responseText || 'Server error',
+    'danger'
+    );
+    });
+    }
+
+    function toolbarClick(args) {
+    var gridObj = document.getElementById("gridData").ej2_instances[0];
+    if (args.item.id === 'gridData_pdfexport') {
+    let pdfExportProperties = {
+    theme: {
+    header: {
+    font: new ej.pdfexport.PdfStandardFont(ej.pdfexport.PdfFontFamily.TimesRoman, 11),
+    caption: { font: new ej.pdfexport.PdfStandardFont(ej.pdfexport.PdfFontFamily.TimesRoman, 9) },
+    record: { font: new ej.pdfexport.PdfStandardFont(ej.pdfexport.PdfFontFamily.TimesRoman, 10) }
+    }
+    }
+    };
+    gridObj.pdfExport(pdfExportProperties);
+    }
+    if (args.item.id === 'gridData_excelexport') {
+    gridObj.excelExport();
+    }
+    if (args.item.id === 'gridData_csvexport') {
+    gridObj.csvExport();
+    }
+    }
+
+    function actionBegin(args) {
+    if (args.requestType == "filterchoicerequest" || args.requestType === 'filtersearchbegin') {
+    args['filterChoiceCount'] = 4000;
+    }
+    }
+</script>
+
+
+@section Scripts
+{
+    <script src="~/lib/bootbox.min.js"></script>
+    <script src="~/lib/ace/Chart.js"></script>
+    <script src="~/js/printThis.js"></script>
+    <script>
+
+
+        $(document).ready(function() {
+
+        function searchData(SearchType) {
+        var Search = document.getElementById('Search' + SearchType).value;
+        showloader();
+        $.ajax({
+        url: '@Url.Action("SearchDataCbsCensus", "Admin")',
+        type: 'POST',
+        data: { Search: Search, SearchType: SearchType },
+        cache: false
+        }).done(function(result) {
+        hideloader();
+        $('#grid').html(result);
+        });
+        }
+
+        function rowSelected(args) {
+        $('#infoModal').modal('show');
+        for (var key in args.data) {
+        var value = args.data[key];
+        $("#" + key).html(value);
+        }
+
+        $("#infoModalTitle").html(args.data["FirstName"] + " " + args.data["LastName"] + "(" + args.data["Napomena"] + ")");
+        }
+
+        function printData() {
+        $('#printArea').printThis({
+        header: "<h3>" + $('#FirstName').html() + " " + $('#LastName').html() + "</h3>"
+        });
+        }
+
+        function rowDataBound(e) {
+        e.row.classList.add(e.data.Napomena);
+        }
+        });
+    </script>
+}

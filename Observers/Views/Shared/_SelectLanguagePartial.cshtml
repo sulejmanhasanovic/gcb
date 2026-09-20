@@ -1,0 +1,41 @@
+﻿@using System.Threading.Tasks
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Options
+
+@inject IViewLocalizer Localizer
+@inject IOptions<RequestLocalizationOptions> LocOptions
+
+@{
+	var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+	List<object> cultureItems = new List<object>();
+	cultureItems.Add(new { Value = "bs-Latn-BA", Text = "Bosanski" });
+	cultureItems.Add(new { Value = "bs-Cyrl-BA", Text = "Srpski" });
+	cultureItems.Add(new { Value = "hr-BA", Text = "Hrvatski" });
+	cultureItems.Add(new { Value = "en-GB", Text = "Engleski" });
+}
+
+<ejs-dropdownlist style=" padding-left:20px; color: whitesmoke " id="culture" name="culture" dataSource="@(cultureItems)"
+				  placeholder="Izaberite jezik" popupHeight="220px" width="200px" 
+				  cssClass="pull-right" change="changeLanguage" value="@requestCulture.RequestCulture.UICulture.Name">
+					<e-dropdownlist-fields text="Text" value="Value"></e-dropdownlist-fields>
+</ejs-dropdownlist>
+
+<script type="text/javascript">
+			function changeLanguage() {
+				var listObj = document.getElementById('culture').ej2_instances[0];
+				$.ajax({
+					type: "POST",
+					url: '@Url.Action("SetLanguage", "Dashboard")',
+					data: { culture: listObj.value }
+				})
+					.done(function (result) {
+						location.reload();
+					})
+					.fail(function (jqXHR, textStatus) {
+						console.log(jqXHR.responseText);
+	});
+
+			}
+</script>

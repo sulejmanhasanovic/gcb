@@ -1,0 +1,127 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Threading.Tasks
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Options
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IViewLocalizer Localizer
+
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+}
+
+<script type="text/javascript">
+    var translations = {
+        Pocetna: '@Localizer["Početna stranica"]',
+        NameRequired: '@Localizer["Naziv političkog subjekta prema odluci je obavezno polje!"]',
+        TypeRequired: '@Localizer["Tip političkog subjekta obavezno polje!"]',
+        Notification: '@Localizer["Obavještenje!"]',
+        Koalicije: '@Localizer["Koalicije"]',
+        Podesavanja: '@Localizer["Podešavanja"]'
+    };
+</script>
+
+<ul class="nav nav-list" id="menu"></ul>
+<ul class="nav has-active-border active-on-right" id="menu_nogroups"></ul>
+
+<script>
+
+    function getmenu() {
+        $.ajax({
+            url: '@Url.Action("GetMenu", "Dashboard")',
+            type: 'POST',
+            data: {},
+            cache: false,
+            dataType: "json"
+        }).done(function (result) {
+            //console.log('menu result ', result)
+            var apps = result["applications"];
+            var culture = result["culture"];
+            var role = result["role"];
+            var html = "";
+
+            for (var item in apps) {
+
+                //console.log('apps[item] ', apps[item])
+                var name = apps[item].NameBs;
+                var description = apps[item].DescriptionBs;
+                var shortName = apps[item].ShortNameBs;
+                console.log(name, description, culture)
+                switch (culture) {
+                    case "hr-BA":
+                        name = apps[item].NameHr;
+                        description = apps[item].DescriptionHr;
+                        shortName = apps[item].ShortNameHr;
+                        break;
+
+                    case "bs-Cyrl-BA":
+                        name = apps[item].NameSr;
+                        description = apps[item].DescriptionSr;
+                        shortName = apps[item].ShortNameSr;
+                        break;
+
+                }
+                if (role == "IM_Admin"
+                    || (apps[item].Id == 1 && role == 'PRP_Admin')
+                    || (apps[item].Id == 1 && role == 'PRP_Obrada')
+                    || (apps[item].Id == 1 && role == 'PRP_Unos')
+                    || (apps[item].Id == 1 && role == 'PRP_Supervizor')
+                    || (apps[item].Id == 2 && role == 'CAND_Admin')
+                    || (apps[item].Id == 2 && role == 'CAND_Obrada')
+                    || (apps[item].Id == 3 && role == 'OBS_Admin')
+                    || (apps[item].Id == 3 && role == 'OBS_Obrada')
+                    || (apps[item].Id == 5 && role == 'PS_Admin')
+                    || (apps[item].Id == 5 && role == 'PS_Obrada')
+                    || (apps[item].Id == 6 && role == 'BOO_Admin')
+                    || (apps[item].Id == 6 && role == 'BOO_Obrada')
+                    || (apps[item].Id == 7 && role == 'BO_Admin')
+                    || (apps[item].Id == 7 && role == 'BO_Obrada')
+                    || (apps[item].Id == 7 && role == 'BO_Payroll')
+                    || (apps[item].Id == 8 && role == 'COM_Admin')
+                    || (apps[item].Id == 8 && role == 'COM_Obrada')
+                    || (apps[item].Id == 8 && role == 'COM_MEC_Obrada')) {
+                    if (apps[item].Id == 4) {
+                        html += `
+                            <li class="nav-item">
+                                    <a href="https://eimovinskikartoni.izbori.ba" class="nav-link">
+                                          <input type="hidden" id="Id" name="Id" value="${apps[item].Id}" >
+                                    <i class="nav-icon ${apps[item].Icon} "></i>
+                                    <span class="nav-text fadeable">
+                                        <span>${shortName}</span>
+                                        <span class="badge px-1 d-none" title = "" data-original-title="${name}" >
+                                            <i class="fas fa-exclamation-triangle text-140 text-danger-m2"></i>
+                                        </span >
+                                    </span>
+                                </a>
+                                <b class="sub-arrow"></b>
+                            </li>`
+                    } else {
+                        html += `
+                                <li class="nav-item">
+                                        <a href="/Dashboard/Applications/?id=${apps[item].Url}" class="nav-link">
+                                            <input type="hidden" id="Id" name="Id" value="${apps[item].Id}" >
+                                        <i class="nav-icon ${apps[item].Icon} "></i>
+                                        <span class="nav-text fadeable">
+                                                    <span>${shortName}</span>
+                                            <span class="badge px-1 d-none" title = "" data-original-title="${name}" >
+                                                <i class="fas fa-exclamation-triangle text-140 text-danger-m2"></i>
+                                            </span >
+                                        </span>
+                                    </a>
+                                    <b class="sub-arrow"></b>
+                                </li>`
+                    }
+                }
+            }
+
+            var menu = document.getElementById('menu');
+            menu.innerHTML = html;
+        });
+    }
+</script>

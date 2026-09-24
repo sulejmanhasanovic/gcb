@@ -1,13 +1,13 @@
-# Nadogradnja: biračka mjesta i generisane vreće
+# Tracking: prijem, priprema i prijem na verifikaciju
 
 ## Ako već imate bazu i korisnika iz prve etape
 
-1. Preuzmite i raspakujte `Tracking-registar-vreca.zip`. Projekt je u `Tracking.Standalone/src/Tracking.Web/Tracking.Web.csproj`.
+1. Preuzmite i raspakujte `Tracking-prijem-verifikacija.zip`. Projekt je u `Tracking.Standalone/src/Tracking.Web/Tracking.Web.csproj`.
 2. Zaustavite staru aplikaciju i napravite backup postojeće baze Tracking.
-3. U SSMS-u na istoj SQL Server instanci izvršite `database/02-upgrade-bag-registry.sql`, zatim `database/03-import-polling-stations.sql`. Ako vaša baza ima drugo ime, prilagodite `USE [Tracking]` na početku obje skripte. Prva skripta dodaje tabele i vezu s prijemom, a druga učitava 662 biračka mjesta. Ne brišu korisnike, pošiljke niti stare vreće. Ponovljeno izvršavanje preskače postojeće migracije/mjesta.
+3. U SSMS-u na istoj SQL Server instanci izvršite `database/02-upgrade-bag-registry.sql`, zatim `database/03-import-polling-stations.sql` i **`database/04-upgrade-bag-workflow.sql`**. Ako već imate registar i uvoz iz prethodnog paketa, dovoljna je skripta **04**. Ako vaša baza ima drugo ime, prilagodite `USE [Tracking]` na početku svih skripti. Prva skripta dodaje tabele i vezu s prijemom, a druga učitava 662 biračka mjesta. Ne brišu korisnike, pošiljke niti stare vreće. Ponovljeno izvršavanje preskače postojeće migracije/mjesta.
 4. U novom projektu podesite konekciju na **istu bazu**, pa pokrenite aplikaciju. Prijavite se postojećim korisnikom. Ne kreirajte novog administratora.
 
-Za potpuno novu bazu izvršite skripte redom **01 → 02 → 03**, pa pokrenite `Start-Tracking.ps1 -SqlServer '.\SQLEXPRESS' -TrustServerCertificate -Initialize` i unesite prvi administratorski nalog.
+Za potpuno novu bazu izvršite skripte redom **01 → 02 → 03 → 04**, pa pokrenite `Start-Tracking.ps1 -SqlServer '.\SQLEXPRESS' -TrustServerCertificate -Initialize` i unesite prvi administratorski nalog.
 
 ## Visual Studio i konekcija
 
@@ -47,7 +47,7 @@ SQLite migracije primjenjuju se na pokretanju, a prekidač učitava priloženi J
 - Za Mobilne, Nepotvrđene, DKP i Odsustvo odaberite kategoriju i sva mjesta ili jedno mjesto. Broj vreće jednak je šifri mjesta, npr. `001A501`; postojeće vreće se preskaču.
 - Za Poštu unesite količinu 1–1.000. Brojevi rastu `001`, `002`, … i ne ponavljaju se nakon brisanja. Preskaču se oznake već korištene u starim prijemima.
 - Pregled omogućava filtriranje po kategoriji i statusu, pretragu, izbor više nezaprimljenih vreća i brisanje. Ako ijedna od odabranih vreća bude zaprimljena, cijeli zahtjev za brisanje se odbija.
-- Pri prijemu unesite/izaberite broj generisane vreće ili skenirajte barkod. Biračko mjesto se preuzima iz registra; nema ručnog polja. Vreća mora pripadati kategoriji prijema i ne smije već biti zaprimljena.
+- Pri prijemu unesite/izaberite broj generisane vreće ili skenirajte barkod. Biračko mjesto se preuzima iz registra; nema ručnog polja. Vreća mora pripadati kategoriji prijema. Poštanska vreća može imati više unosa unutar iste otvorene pošiljke; druge kategorije primaju se jednom.
 - Stare zaprimljene vreće ostaju u svojim pošiljkama. Ne kreiraju se retroaktivno u registru; njihove oznake se ne mogu ponovo generisati.
 - Jedan šifrarnik/izborni ciklus po bazi. Uvoz drugog ciklusa u postojeću bazu se odbija.
 
@@ -73,10 +73,27 @@ Izvorni tip **O označava Poštu**, a ne Odsustvo. Redovna mjesta (1), lično (9
 
 ElectionCode, MunicipalityCode i MunicipalityName zadržavaju nazive. Šifre su tekstualne, a sve količine nullable bigint; izvorne NULL vrijednosti se ne pretvaraju u nule. Dvije izvorne kolone Regular i Redovni ostaju zasebne. Lokacije i geografske koordinate nisu preuzete.
 
-## Obuhvat ove nadogradnje
+## Radni tok u ovoj verziji
 
-Ova etapa dodaje registar i povezivanje s postojećim prijemom. Prilagođavanje grupnog prijema Pošte prema slikama, zaseban neposredni prijem drugih kategorija, izmjene zaprimljenih količina, šifrarnik razloga odbijanja, kontrolno brojanje i prijem za verifikaciju ostaju naredna dogovorena etapa. Postojeće pravilo zatvaranja prijema po količini nije promijenjeno.
+1. **Razlozi odbijanja**: administrator/supervizor dodaje, uređuje i deaktivira razloge po kategorijama. Šifrarnik je inicijalno prazan; unesite važeće razloge svoje komisije. Neaktivni razlozi ne nude se za nove unose; raniji zapisi čuvaju tadašnji naziv i količinu.
+2. **Prijem**: izaberite kategoriju. Za Mobilne, Nepotvrđene, DKP i Odsustvo „Novi prijem” otvara direktan unos poznate vreće, količine i datuma; oznaka prijema se dodjeljuje automatski. Nakon snimanja provjerite podatke i kliknite „Završi prijem”.
+3. **Pošta**: otvorite pošiljku s najavljenim količinama. U istu vreću možete unositi više stavki s različitim pretincima, redovnom ili brzom poštom i napomenama. Neuručene pošiljke i ostali materijali evidentiraju se zasebno. Supervizor može ispraviti svaki unos uz obavezan razlog. Zatvaranje provjerava i koverte i materijale; završeni prijem je zaključan.
+4. **Priprema i verifikacija**: završene vreće pojavljuju se u pregledu, s pretragom i filterima kategorije/statusa. Otvorite vreću i unesite kontrolno prebrojanu količinu. Ako se razlikuje od prijema, ponovite brojanje, označite potvrdu i upišite obrazloženje. Prvobitna količina ostaje sačuvana.
+5. **Priprema**: upišite prihvaćene i odbijene koverte te raspored odbijenih po razlozima. Prihvaćene + odbijene moraju biti jednake kontrolnom brojanju; zbir razloga mora biti jednak odbijenima. Svaka odbijena koverta računa se pod jednim razlogom.
+6. **Verifikacija – prijem materijala**: unesite stvarno preuzeti broj prihvaćenih koverata. Mora se poklapati s pripremom. Kod neslaganja supervizor može vratiti vreću na pripremu uz obrazloženje. Tada slijede novo brojanje i nova priprema; prethodni rezultati i razlozi ostaju u historiji.
+
+Operater prijema radi prijem, brojanje, pripremu i prijem na verifikaciju. Supervizor/administrator održava razloge, ispravlja prijem i vraća vreće. Uloga Pregled nema mogućnost snimanja. Svako snimanje provjerava da drugi operater nije u međuvremenu promijenio podatke.
+
+Ova verzija završava na **prijemu materijala na verifikaciju**. Pojedinačna verifikacija glasača/koverata, skeniranje, pakovanje, kutije i daljnje sortiranje nisu u ovom dogovorenom obuhvatu. Odbijene koverte evidentiraju se po razlozima uz izvornu vreću; ne kreira se poseban daljnji tok za odbijene poštanske koverte.
+
+## Šta skripta 04 čuva i dodaje
+
+Dodaje status obrade i kontrolne količine vreće, detalje poštanskih unosa, evidenciju odvojenih materijala i šifrarnik razloga. Postojeće količine vreća prenose se u po jednu početnu stavku. Postojeće neuručene/ostale količine prenose se kao evidentirani materijali, jer ih je prethodna verzija tako vodila. Korisnici, login, vreće i prvobitne količine ostaju sačuvani. Ponovljeno izvršavanje preskače već primijenjenu migraciju. Prije nadogradnje napravite backup; skripte izvršavajte u SSMS-u.
+
+SQLite se nadograđuje automatski na pokretanju. Prije zamjene aplikacije zaustavite je i sačuvajte kopiju App_Data. Za SQL Server izvršite SQL skripte prije pokretanja nove verzije.
 
 ## Provjera
 
-Automatizovane provjere uključuju nadogradnju SQLite baze sa starim prijemom, uvoz, duplikate, numeraciju, svih pet kategorija, zaštitu brisanja i historiju. SQL Server migracije i DDL su generisani i provjereni bez spajanja na živu SQL Server instancu. Izvršavanje SQL skripti na SQL Serveru ostaje provjera na vašoj testnoj instanci.
+Release build je prošao. Prošlo je **147 provjera modela, migracija i poslovne logike**, **16 HTTP provjera registra**, **35 HTTP provjera obrade i prava** i **14 HTTP provjera grupnog prijema Pošte** — ukupno **212**. Vizuelno su provjereni priprema i pregled poštanskih stavki u pregledniku.
+
+SQL Server migracije i idempotentne skripte generisane su i pregledane; **nisu izvršene na živoj SQL Server instanci**. Izvršavanje na vašoj testnoj instanci ostaje potrebno. NuGet provjera sigurnosnih obavijesti nije bila dostupna zbog mreže (NU1900); build je završen bez grešaka.

@@ -1,20 +1,16 @@
-# Tracking: prijem, verifikacija i skeniranje
+# Tracking: prijem, verifikacija, pakovanje i skeniranje
 
-## Nadogradnja postojeće aplikacije
+Preuzmite **Tracking-kutije.zip**. Projekt je `Tracking.Standalone/src/Tracking.Web/Tracking.Web.csproj`.
 
-Preuzmite **Tracking-skeniranje.zip**. Projekt je `Tracking.Standalone/src/Tracking.Web/Tracking.Web.csproj`.
+Nova verzija povezuje tok od prijema vreće do napunjene kutije. Uključuje konačni rezultat verifikacije, razloge odbijanja, formiranje kutija po kategoriji i kombinaciji, raspodjelu iz vreća, pregled porijekla i zaključavanje punjenja. Skeniranje ostaje nezavisno. Postojeća prava nisu reorganizovana.
 
-Ako već imate prijem i verifikaciju (skripta 04), zaustavite aplikaciju, napravite backup i izvršite **05-upgrade-scanning.sql**, zatim pripremite uvoz birača skriptom **06-import-voters.sql**. Zadržite postojeću konekciju i nalog.
+Za postojeću SQL Server instalaciju koja ima nadogradnju 05, primijenite **database/07-upgrade-packaging.sql**, uz prethodni backup i prilagođen naziv baze. Zadržite svoju konekciju i korisničke naloge. Birače nije potrebno uvoziti za pakovanje.
 
-**Detaljne upute su u UPGRADE-SCANNING.md** unutar paketa: upišite tačan `@ElectionCode`, pripremite izvornu `dbo.Voter` s podacima, izvršite uvoz i podesite `Tracking:ElectionCode` u konfiguraciji. `PSCode` se koristi ako postoji, inače `PollingStation`. Stare procedure i p3_VotesCast se ne prenose; novi VotesCast puni se samo uspješnim skeniranjem.
+Detaljne upute i primjer za prezentaciju: [UPGRADE-PACKAGING.md](UPGRADE-PACKAGING.md).
 
-Za novu bazu redoslijed je **01 → 02 → 03 → 04 → 05 → 06**, zatim inicijalizacija administratora. Za bazu iz prve etape prvo dodajte nedostajuće skripte 02–04. Prilagodite `USE [Tracking]` ako vaša baza ima drugo ime. Provjerite da registar iz skripte 03 odgovara izborima koje obrađujete.
+Za novu bazu: šema 01 → 02 → 04 → 05 → 07, zatim inicijalizacija prvog korisnika. 03 služi uvozu biračkih mjesta, a 06 uvozu birača; provjerite izborne podatke prije tih uvoza. Za skeniranje i ElectionCode slijedite [UPGRADE-SCANNING.md](UPGRADE-SCANNING.md). SQLite se migrira pri pokretanju.
 
-Meni je organizovan redom: Generisanje vreća, Prijem pošiljki, Prijem i verifikacija, Skeniranje, Administracija. Aktivna grupa je proširena; Biračka mjesta i Razlozi odbijanja su u Administraciji.
-
-Skeniranje podržava Nepotvrđene, Odsustvo, Mobilne, Poštu, DKP i Redovne. Za svako mjesto postoje statusi Započeto, U toku i Završeno. Pošta se skenira zajednički. Otvaranje Redovnih ne kopira birače u VotesCast. Prihvat zahtijeva pravo glasa, odgovarajući tip i mjesto (osim Pošte) i da birač nije već evidentiran za iste izbore. Pamte se operater i UTC vrijeme; odbijeni pokušaji imaju razlog i ne povećavaju izlaznost.
-
-Nova uloga Operater skeniranja omogućava unos i završavanje skeniranja. Administratori, supervizori i postojeći operateri prijema također mogu skenirati. Uloga Pregled ima samo pregled. Ponovno otvaranje završenog mjesta i poništavanje glasova nisu dio ove etape.
+Obuhvat završava napunjenom kutijom prihvaćenih koverti. KR pakovanje, sortiranje, brojanje listića i integracija brzih skenera ostaju za naredni dogovor.
 
 ## Visual Studio i konekcija
 
@@ -99,8 +95,3 @@ Dodaje status obrade i kontrolne količine vreće, detalje poštanskih unosa, ev
 
 SQLite se nadograđuje automatski na pokretanju. Prije zamjene aplikacije zaustavite je i sačuvajte kopiju App_Data. Za SQL Server izvršite SQL skripte prije pokretanja nove verzije.
 
-## Provjera ove verzije
-
-Release build: bez grešaka. **147 provjera postojeće obrade**, **72 provjere skeniranja** i **72 provjere web formi skeniranja** prošle su: ukupno **291** u ovoj etapi. Provjerene su i istovremene promjene više operatera, zaštita od duplikata i zabrana skeniranja nakon završetka. U pregledniku je provjeren unos tipkom Enter, vraćanje fokusa i novi meni.
-
-SQL Server migracija i skripte su generisane i pregledane. Povezivanje s lokalnim SQL Serverom nije uspjelo zbog Windows/SSL autentikacije, pa skripte 05 i 06 još treba izvršiti na kopiji vaše SQL Server baze. NuGet provjera sigurnosnih obavijesti nije bila dostupna (NU1900); kompilacija je uspjela.
